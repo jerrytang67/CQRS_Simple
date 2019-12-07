@@ -1,5 +1,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using AutoMapper;
 using CQRS_Simple.EntityFrameworkCore;
 using CQRS_Simple.Modules;
 using Microsoft.AspNetCore.Builder;
@@ -35,6 +36,8 @@ namespace CQRS_Simple
         {
             services.AddControllersWithViews();
 
+//            services.AddAutoMapper(typeof(Startup));
+
             services.AddDbContext<SimpleDbContext>(options =>
                 options.UseSqlServer(_configuration["ConnectionStrings:Default"]));
 
@@ -49,6 +52,7 @@ namespace CQRS_Simple
         {
             builder.RegisterModule(new InfrastructureModule(_configuration["ConnectionStrings:Default"]));
             builder.RegisterModule(new MediatorModule());
+            builder.RegisterModule(new AutoMapperModule());
         }
 
         // Configure is where you add middleware. This is called after

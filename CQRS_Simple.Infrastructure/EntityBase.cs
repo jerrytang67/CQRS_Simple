@@ -1,10 +1,55 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace CQRS_Simple.Infrastructure
 {
-    public class EntityBase<T>
+    public class Entity<TPrimaryKey> : IEntity<TPrimaryKey>
     {
         [Key]
-        public T Id { get; set; }
+        public virtual TPrimaryKey Id { get; set; }
+
+        private List<IDomainEvent> _domainEvents;
+
+        /// <summary>
+        /// Domain events occurred.
+        /// </summary>
+        protected IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents?.AsReadOnly();
+
+        /// <summary>
+        /// Add domain event.
+        /// </summary>
+        /// <param name="domainEvent"></param>
+        protected void AddDomainEvent(IDomainEvent domainEvent)
+        {
+            _domainEvents = _domainEvents ?? new List<IDomainEvent>();
+            this._domainEvents.Add(domainEvent);
+        }
+
+        /// <summary>
+        /// Clead domain events.
+        /// </summary>
+        public void ClearDomainEvents()
+        {
+            _domainEvents?.Clear();
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return Id == null ? 0 : Id.GetHashCode();
+        }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return $"[{GetType().Name} {Id}]";
+        }
+    }
+
+    public interface IEntity<TPrimaryKey>
+    {
+        TPrimaryKey Id { get; set; }
+
+        void ClearDomainEvents();
     }
 }

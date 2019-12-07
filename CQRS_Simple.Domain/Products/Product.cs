@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace CQRS_Simple.Domain.Products
 {
     [Table("Products")]
-    public class Product : EntityBase<int>, IAggregateRoot
+    public class Product : Entity<int>, IAggregateRoot
     {
         [StringLength(256)]
         [Required]

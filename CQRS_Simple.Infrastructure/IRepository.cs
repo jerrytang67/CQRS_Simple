@@ -9,7 +9,7 @@ using Dapper;
 
 namespace CQRS_Simple.Infrastructure
 {
-    public interface IDapperRepository<T, C> where T : EntityBase<C>, IAggregateRoot
+    public interface IDapperRepository<T, C> where T : Entity<C>, IAggregateRoot
     {
         Task AddAsync(T item);
         Task RemoveAsync(T item);
@@ -19,7 +19,7 @@ namespace CQRS_Simple.Infrastructure
         Task<IEnumerable<T>> GetAllAsync();
     }
 
-    public class DapperRepository<T, C> : IDapperRepository<T, C> where T : EntityBase<C>, IAggregateRoot
+    public class DapperRepository<T, C> : IDapperRepository<T, C> where T : Entity<C>, IAggregateRoot
     {
         private readonly ISqlConnectionFactory _sqlConnectionFactory;
         private readonly string _tableName;
