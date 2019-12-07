@@ -18,6 +18,8 @@ namespace CQRS_Simple
         public IConfigurationRoot _configuration { get; }
         public ILifetimeScope AutofacContainer { get; private set; }
 
+        private const string SqlServerConnection = "ConnectionStrings:Default";
+
         public Startup(IWebHostEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -36,10 +38,10 @@ namespace CQRS_Simple
         {
             services.AddControllersWithViews();
 
-//            services.AddAutoMapper(typeof(Startup));
+            //            services.AddAutoMapper(typeof(Startup));
 
             services.AddDbContext<SimpleDbContext>(options =>
-                options.UseSqlServer(_configuration["ConnectionStrings:Default"]));
+                options.UseSqlServer(_configuration[SqlServerConnection]));
 
             AddSwagger(services);
         }
@@ -50,7 +52,7 @@ namespace CQRS_Simple
         // Don't build the container; that gets done for you by the factory.
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterModule(new InfrastructureModule(_configuration["ConnectionStrings:Default"]));
+            builder.RegisterModule(new InfrastructureModule(_configuration[SqlServerConnection]));
             builder.RegisterModule(new MediatorModule());
             builder.RegisterModule(new AutoMapperModule());
         }
