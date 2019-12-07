@@ -1,12 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CQRS_Simple.Infrastructure;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CQRS_Simple.Domain.Products
 {
-    public class Product
+    [Table("Products")]
+    public class Product : EntityBase<int>, IAggregateRoot
     {
-        [Key]
-        public int Id { get; set; }
-
         [StringLength(256)]
         [Required]
         public string Name { get; set; }

@@ -20,6 +20,9 @@ namespace CQRS_Simple.Modules
                 .WithParameter("connectionString", _databaseConnectionString)
                 .InstancePerLifetimeScope();
 
+            builder.RegisterGeneric(typeof(DapperRepository<,>)).As(typeof(IDapperRepository<,>))
+                .InstancePerDependency();
+
         }
     }
 }
