@@ -10,6 +10,7 @@ using CQRS_Simple.Infrastructure;
 using CQRS_Simple.Products.Event;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CQRS_Simple.API.Orders
 {
@@ -17,14 +18,18 @@ namespace CQRS_Simple.API.Orders
     [Route("api/products")]
     public class ProductsController : ControllerBase
     {
+        private readonly ILogger<ProductsController> _logger;
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
         private readonly IDapperRepository<Product, int> _productDapperRepository;
 
-        public ProductsController(IMediator mediator,
+        public ProductsController(
+            ILogger<ProductsController> logger,
+            IMediator mediator,
             IDapperRepository<Product, int> productDapperRepository
             , IMapper mapper)
         {
+            _logger = logger;
             _mediator = mediator;
             _productDapperRepository = productDapperRepository;
             _mapper = mapper;
@@ -43,6 +48,8 @@ namespace CQRS_Simple.API.Orders
             await _productDapperRepository.AddAsync(new Product { Code = "aa", Name = "cc" });
 
             await _productDapperRepository.UpdateAsync(product);
+
+            _logger.LogInformation("GetProduct");
 
             return Ok(_mapper.Map<ProductDto>(product));
         }

@@ -5,42 +5,42 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace CQRS_Simple.MQ
 {
     public class RabbitListener : IHostedService
     {
-        private readonly ILogger _logger;
-        private readonly IConfigurationRoot _configurationRoot;
+        private readonly RabbitMQOptions _options;
         private readonly IConnection connection;
         private readonly IModel channel;
 
         public RabbitListener(
-            ILogger<RabbitListener> logger,
-            IConfigurationRoot configurationRoot
+            IOptions<RabbitMQOptions> optionsAccessor
             )
         {
-            _logger = logger;
-            _configurationRoot = configurationRoot;
+            _options = optionsAccessor.Value;
             try
             {
                 var factory = new ConnectionFactory()
                 {
-                    UserName = _configurationRoot.GetSection("RabbitMQ:UserName").ToString(),
-                    Password = _configurationRoot.GetSection("RabbitMQ:Password").ToString(),
-                    HostName = _configurationRoot.GetSection("RabbitMQ:HostName").ToString(),
-                    Port = int.Parse(_configurationRoot.GetSection("RabbitMQ:Port").ToString())
+                    UserName = _options.UserName,
+                    Password = _options.Password,
+                    HostName = _options.HostName,
+                    Port = _options.Port
                 };
                 this.connection = factory.CreateConnection();
                 this.channel = connection.CreateModel();
-                logger.LogWarning($"RabbitMQ 连接成功");
+                Log.Information($"RabbitMQ 连接成功");
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"RabbitListener init error,ex:{ex.Message}");
+                Log.Error($"RabbitListener init error,ex:{ex.Message}");
             }
         }
 
@@ -68,7 +68,7 @@ namespace CQRS_Simple.MQ
                 var body = ea.Body;
                 var message = Encoding.UTF8.GetString(body);
                 var result = await ProcessAsync(message);
-                _logger.LogWarning($"收到消息： {message} routerKey: { ea.RoutingKey}");
+                Log.Information($"收到消息： {message} routerKey: { ea.RoutingKey}");
                 if (result)
                 {
                     channel.BasicAck(ea.DeliveryTag, false);
@@ -92,4 +92,15 @@ namespace CQRS_Simple.MQ
         }
     }
 
+    public class RabbitMQOptions
+    {
+        public RabbitMQOptions()
+        {
+        }
+
+        public string UserName { get; set; }
+        public string Password { get; set; }
+        public string HostName { get; set; }
+        public int Port { get; set; }
+    }
 }

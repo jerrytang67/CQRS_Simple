@@ -3,6 +3,7 @@ using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using CQRS_Simple.EntityFrameworkCore;
 using CQRS_Simple.Modules;
+using CQRS_Simple.MQ;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,6 @@ namespace CQRS_Simple
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
 
-
             _configuration = builder.Build();
         }
 
@@ -36,12 +36,18 @@ namespace CQRS_Simple
         // called by the runtime before the ConfigureContainer method, below.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<RabbitMQOptions>(_configuration.GetSection("RabbitMQ"));
+
+            services.AddHostedService<MyListener>();
+
             services.AddControllersWithViews();
 
             //            services.AddAutoMapper(typeof(Startup));
 
             services.AddDbContext<SimpleDbContext>(options =>
                 options.UseSqlServer(_configuration[SqlServerConnection]));
+
+
 
             AddSwagger(services);
         }
@@ -52,6 +58,7 @@ namespace CQRS_Simple
         // Don't build the container; that gets done for you by the factory.
         public void ConfigureContainer(ContainerBuilder builder)
         {
+            builder.RegisterModule(new LoggerModule());
             builder.RegisterModule(new InfrastructureModule(_configuration[SqlServerConnection]));
             builder.RegisterModule(new MediatorModule());
             builder.RegisterModule(new AutoMapperModule());
