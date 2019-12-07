@@ -1,8 +1,10 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using CQRS_Simple.EntityFrameworkCore;
 using CQRS_Simple.Modules;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,41 +14,46 @@ namespace CQRS_Simple
 {
     public class Startup
     {
+        public IConfigurationRoot _configuration { get; }
+        public ILifetimeScope AutofacContainer { get; private set; }
+
         public Startup(IWebHostEnvironment env)
         {
-            // In ASP.NET Core 3.0 `env` will be an IWebHostingEnvironment, not IHostingEnvironment.
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
-            this.Configuration = builder.Build();
+
+
+            _configuration = builder.Build();
         }
 
-        public IConfigurationRoot Configuration { get; private set; }
-        public ILifetimeScope AutofacContainer { get; private set; }
-
+        // ConfigureServices is where you register dependencies. This gets
+        // called by the runtime before the ConfigureContainer method, below.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
 
+            services.AddDbContext<SimpleDbContext>(options =>
+                options.UseSqlServer(_configuration["ConnectionStrings:Default"]));
+
             AddSwagger(services);
-
-            //services.AddMediatR(Assembly.GetExecutingAssembly());
-
-//            services.AddSpaStaticFiles(configuration =>
-//            {
-//                configuration.RootPath = "ClientApp/dist";
-//            });
-
         }
 
+        // ConfigureContainer is where you can register things directly
+        // with Autofac. This runs after ConfigureServices so the things
+        // here will override registrations made in ConfigureServices.
+        // Don't build the container; that gets done for you by the factory.
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterModule(new InfrastructureModule(this.Configuration["ConnectionString"]));
+            builder.RegisterModule(new InfrastructureModule(_configuration["ConnectionStrings:Default"]));
             builder.RegisterModule(new MediatorModule());
         }
 
+        // Configure is where you add middleware. This is called after
+        // ConfigureContainer. You can use IApplicationBuilder.ApplicationServices
+        // here if you need to resolve things from the container.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             this.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
@@ -76,16 +83,6 @@ namespace CQRS_Simple
                     pattern: "{controller}/{action=Index}/{id?}");
             });
 
-//            app.UseSpa(spa =>
-//            {
-//                spa.Options.SourcePath = "ClientApp";
-//
-//                if (env.IsDevelopment())
-//                {
-//                    spa.UseAngularCliServer(npmScript: "start");
-//                }
-//            });
-
             ConfigureSwagger(app);
 
         }
@@ -106,12 +103,6 @@ namespace CQRS_Simple
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
                 options.DocInclusionPredicate((docName, description) => true);
-
-
-//                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-//                var commentsFileName = Assembly.GetExecutingAssembly().GetName().Name + ".XML";
-//                var commentsFile = Path.Combine(baseDirectory, commentsFileName);
-//                options.IncludeXmlComments(commentsFile);
             });
         }
     }

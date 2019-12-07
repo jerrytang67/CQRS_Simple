@@ -5,7 +5,7 @@ using System.Reflection;
 using Autofac;
 using Autofac.Core;
 using Autofac.Features.Variance;
-using CQRS_Simple.API.Products;
+using CQRS_Simple.Products.Event;
 using FluentValidation;
 using MediatR;
 using MediatR.Pipeline;
