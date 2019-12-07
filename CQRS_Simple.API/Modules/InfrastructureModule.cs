@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using CQRS_Simple.Infrastructure;
+using CQRS_Simple.MQ;
 using MediatR;
 
 namespace CQRS_Simple.Modules
@@ -15,6 +16,9 @@ namespace CQRS_Simple.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<RabbitMQClient>()
+                .SingleInstance();
+
             builder.RegisterType<SqlConnectionFactory>()
                 .As<ISqlConnectionFactory>()
                 .WithParameter("connectionString", _databaseConnectionString)

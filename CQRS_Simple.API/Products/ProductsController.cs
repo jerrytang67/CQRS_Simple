@@ -7,6 +7,7 @@ using AutoMapper;
 using CQRS_Simple.Domain.Products;
 using CQRS_Simple.Dtos;
 using CQRS_Simple.Infrastructure;
+using CQRS_Simple.MQ;
 using CQRS_Simple.Products.Event;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,7 @@ namespace CQRS_Simple.API.Orders
     public class ProductsController : ControllerBase
     {
         private readonly ILogger<ProductsController> _logger;
+        private readonly RabbitMQClient _mq;
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
         private readonly IDapperRepository<Product, int> _productDapperRepository;
@@ -27,12 +29,13 @@ namespace CQRS_Simple.API.Orders
             ILogger<ProductsController> logger,
             IMediator mediator,
             IDapperRepository<Product, int> productDapperRepository
-            , IMapper mapper)
+            , IMapper mapper, RabbitMQClient mq)
         {
             _logger = logger;
             _mediator = mediator;
             _productDapperRepository = productDapperRepository;
             _mapper = mapper;
+            _mq = mq;
         }
 
         [HttpGet]
@@ -60,6 +63,9 @@ namespace CQRS_Simple.API.Orders
         public async Task<IActionResult> GetAll(ProductsRequestInput input)
         {
             var list = await _productDapperRepository.FindAsync(x => x.Id > 1);
+
+            _mq.PushMessage(new { TT = 123 });
+
             return Ok(_mapper.Map<List<ProductDto>>(list.ToList()));
         }
 

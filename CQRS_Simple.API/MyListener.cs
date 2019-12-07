@@ -1,17 +1,17 @@
 ﻿using System.Threading.Tasks;
 using CQRS_Simple.MQ;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CQRS_Simple
 {
     public class MyListener : RabbitListener
     {
+        private readonly RabbitMQOptions _options;
         public MyListener(IOptions<RabbitMQOptions> optionsAccessor)
             : base(optionsAccessor)
         {
-            base.QueueName = "CQRS_Simple_Queue";
+            _options = optionsAccessor.Value;
+            base.QueueName = _options.QueryName;
             base.RouteKey = "Test.*";
         }
 

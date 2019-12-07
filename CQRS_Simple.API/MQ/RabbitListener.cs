@@ -102,5 +102,8 @@ namespace CQRS_Simple.MQ
         public string Password { get; set; }
         public string HostName { get; set; }
         public int Port { get; set; }
+
+        public string QueryName { get; set; }
+
     }
 }
