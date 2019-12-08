@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CQRS_Simple.Domain.Products;
 using CQRS_Simple.Dtos;
 using CQRS_Simple.Infrastructure;
+using CQRS_Simple.Infrastructure.Dapper;
 using Dapper;
 using MediatR;
 

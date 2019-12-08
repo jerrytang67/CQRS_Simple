@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using CQRS_Simple.Infrastructure;
-using CQRS_Simple.MQ;
-using MediatR;
+using CQRS_Simple.Infrastructure.Dapper;
+using CQRS_Simple.Infrastructure.MQ;
 
 namespace CQRS_Simple.Modules
 {

@@ -2,16 +2,13 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace CQRS_Simple.MQ
+namespace CQRS_Simple.Infrastructure.MQ
 {
     public class RabbitListener : IHostedService
     {
@@ -61,7 +58,7 @@ namespace CQRS_Simple.MQ
             channel.QueueDeclare(QueueName, true, false, false, null);
 
             channel.QueueBind(queue: QueueName, exchange: "message", routingKey: RouteKey);
-            var consumer = new EventingBasicConsumer(channel);
+            var consumer = new AsyncEventingBasicConsumer(channel);
 
             consumer.Received += async (model, ea) =>
             {
@@ -73,6 +70,7 @@ namespace CQRS_Simple.MQ
                 {
                     channel.BasicAck(ea.DeliveryTag, false);
                 }
+                await Task.Yield();
             };
             channel.BasicConsume(queue: QueueName, consumer: consumer);
 

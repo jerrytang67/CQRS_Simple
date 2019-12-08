@@ -1,9 +1,8 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using AutoMapper;
 using CQRS_Simple.EntityFrameworkCore;
+using CQRS_Simple.Infrastructure.MQ;
 using CQRS_Simple.Modules;
-using CQRS_Simple.MQ;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -42,12 +41,8 @@ namespace CQRS_Simple
 
             services.AddControllersWithViews();
 
-            //            services.AddAutoMapper(typeof(Startup));
-
             services.AddDbContext<SimpleDbContext>(options =>
                 options.UseSqlServer(_configuration[SqlServerConnection]));
-
-
 
             AddSwagger(services);
         }

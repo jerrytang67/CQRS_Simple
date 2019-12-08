@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using CQRS_Simple.MQ;
+using CQRS_Simple.Infrastructure.MQ;
 using Microsoft.Extensions.Options;
 
 namespace CQRS_Simple
