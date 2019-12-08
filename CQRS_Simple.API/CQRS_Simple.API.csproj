@@ -37,4 +37,8 @@
     <ProjectReference Include="..\CQRS_Simple.Infrastructure\CQRS_Simple.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="controller\" />
+  </ItemGroup>
+
 </Project>

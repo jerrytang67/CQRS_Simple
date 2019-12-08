@@ -8,7 +8,7 @@ using Dapper;
 
 namespace CQRS_Simple.Infrastructure.Dapper
 {
-    public interface IDapperRepository<T, C> where T : Entity<C>, IAggregateRoot
+    public interface IDapperRepository<T, C> where T : Entity<C>
     {
         Task AddAsync(T item);
         Task RemoveAsync(T item);

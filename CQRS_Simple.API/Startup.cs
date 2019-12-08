@@ -1,3 +1,4 @@
+using System;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CQRS_Simple.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
 
 namespace CQRS_Simple
 {
@@ -39,7 +41,15 @@ namespace CQRS_Simple
 
             services.AddHostedService<MyListener>();
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(option =>
+            {
+                option.AllowEmptyInputInBodyModelBinding = true; // false as Default
+            }).AddNewtonsoftJson(
+            options =>
+            {
+                // Use the default property (Pascal) casing
+                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            });
 
             services.AddDbContext<SimpleDbContext>(options =>
                 options.UseSqlServer(_configuration[SqlServerConnection]));
@@ -109,8 +119,15 @@ namespace CQRS_Simple
         {
             services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "API",
+                    Version = "v1",
+                    Description = "A simple example ASP.NET Core Web API",
+                    TermsOfService = new Uri("https://somall.top/about")
+                });
                 options.DocInclusionPredicate((docName, description) => true);
+
             });
         }
     }

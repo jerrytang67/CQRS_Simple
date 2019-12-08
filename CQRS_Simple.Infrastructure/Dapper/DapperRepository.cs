@@ -8,7 +8,7 @@ using Dapper;
 
 namespace CQRS_Simple.Infrastructure.Dapper
 {
-    public class DapperRepository<T, C> : IDapperRepository<T, C> where T : Entity<C>, IAggregateRoot
+    public class DapperRepository<T, TC> : IDapperRepository<T, TC> where T : Entity<TC>
     {
         private readonly ISqlConnectionFactory _sqlConnectionFactory;
         private readonly string _tableName;
@@ -20,7 +20,7 @@ namespace CQRS_Simple.Infrastructure.Dapper
             _tableName = (attr as TableAttribute)?.Name;
         }
 
-        public async Task<T> GetByIdAsync(C id)
+        public async Task<T> GetByIdAsync(TC id)
         {
             using (var db = _sqlConnectionFactory.GetOpenConnection())
             {
@@ -35,7 +35,7 @@ namespace CQRS_Simple.Infrastructure.Dapper
             using (var db = _sqlConnectionFactory.GetOpenConnection())
             {
                 //                var parameters = (object)Mapping(item);
-                item.Id = await db.InsertAsync<C>(_tableName, item);
+                item.Id = await db.InsertAsync<TC>(_tableName, item);
             }
         }
 
