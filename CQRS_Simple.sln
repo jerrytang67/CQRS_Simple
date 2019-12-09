@@ -9,11 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CQRS_Simple.Domain", "CQRS_
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CQRS_Simple.Infrastructure", "CQRS_Simple.Infrastructure\CQRS_Simple.Infrastructure.csproj", "{14AB059D-1475-4A91-AAF4-312FCB265E81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CQRS_Simple.EntityFrameworkCore", "CQRS_Simple.EntityFrameworkCore\CQRS_Simple.EntityFrameworkCore.csproj", "{F6AFAF16-2BA5-4789-9EE4-A6F75CBBF4F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CQRS_Simple.EntityFrameworkCore", "CQRS_Simple.EntityFrameworkCore\CQRS_Simple.EntityFrameworkCore.csproj", "{F6AFAF16-2BA5-4789-9EE4-A6F75CBBF4F7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{31A46403-BFDD-499A-8EC2-2EABDC096A47}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{439AFE5F-24A5-4F70-9BEC-690E124C5D30}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CQRS_Simple.Tests", "CQRS_Simple.Tests\CQRS_Simple.Tests.csproj", "{824FCC5C-EE42-4AD8-8B00-DBC98EFA75A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +39,10 @@ Global
 		{F6AFAF16-2BA5-4789-9EE4-A6F75CBBF4F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6AFAF16-2BA5-4789-9EE4-A6F75CBBF4F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6AFAF16-2BA5-4789-9EE4-A6F75CBBF4F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{824FCC5C-EE42-4AD8-8B00-DBC98EFA75A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{824FCC5C-EE42-4AD8-8B00-DBC98EFA75A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{824FCC5C-EE42-4AD8-8B00-DBC98EFA75A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{824FCC5C-EE42-4AD8-8B00-DBC98EFA75A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

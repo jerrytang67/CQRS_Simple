@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.0" />
+
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CQRS_Simple.Infrastructure\CQRS_Simple.Infrastructure.csproj" />
   </ItemGroup>
 

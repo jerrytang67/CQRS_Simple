@@ -1,9 +1,11 @@
 using System;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using CQRS_Simple.Domain.Products;
 using CQRS_Simple.EntityFrameworkCore;
 using CQRS_Simple.Infrastructure.MQ;
 using CQRS_Simple.Modules;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -48,12 +50,10 @@ namespace CQRS_Simple
             services.AddControllersWithViews(option =>
             {
                 option.AllowEmptyInputInBodyModelBinding = true; // false as Default
-            }).AddNewtonsoftJson(
-            options =>
-            {
-                // Use the default property (Pascal) casing
-                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-            });
+            })
+                .AddNewtonsoftJson(c => { c.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver(); })
+                .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<ProductValidator>())
+                ;
 
             services.AddDbContext<SimpleDbContext>(options =>
                 options.UseSqlServer(_configuration[SqlServerConnection]));
@@ -69,7 +69,7 @@ namespace CQRS_Simple
         {
             builder.RegisterModule(new LoggerModule());
             builder.RegisterModule(new InfrastructureModule(_configuration[SqlServerConnection]
-//                , _LoggerFactory
+                //                , _LoggerFactory
                 ));
             builder.RegisterModule(new MediatorModule());
             builder.RegisterModule(new AutoMapperModule());
@@ -84,7 +84,7 @@ namespace CQRS_Simple
 
             _LoggerFactory = loggerFactory;
 
-//            loggerFactory.AddSerilog();
+            loggerFactory.AddSerilog();
 
             if (env.IsDevelopment())
             {

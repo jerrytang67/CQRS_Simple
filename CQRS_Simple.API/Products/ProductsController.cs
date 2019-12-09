@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using CQRS_Simple.Domain.Products;
+using CQRS_Simple.Domain.Products.Request;
 using CQRS_Simple.Dtos;
 using CQRS_Simple.Infrastructure.Dapper;
 using CQRS_Simple.Infrastructure.MQ;
@@ -39,27 +40,20 @@ namespace CQRS_Simple.API.Products
         }
 
         [HttpGet]
-        [Route("getProduct/{productId}")]
+        [Route("getProduct/{id}")]
         [ProducesResponseType(typeof(ProductDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetProduct(int productId)
+        public async Task<IActionResult> GetProduct(int id)
         {
-            //            var product = await _mediator.Send(new GetProductsQuery(productId));
-
-            var product = await _productDapperRepository.GetByIdAsync(productId);
-
-            //            product.Code = "asdfsdfasdfasdf";
-
+            var product = await _productDapperRepository.GetByIdAsync(id);
             await _productDapperRepository.AddAsync(new Product { Code = "aa", Name = "cc" });
-
-            //            await _productDapperRepository.UpdateAsync(product);
 
             return Ok(_mapper.Map<ProductDto>(product));
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("getAll")]
         [ProducesResponseType(typeof(List<ProductDto>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetAll(ProductsRequestInput input)
+        public async Task<IActionResult> GetAll([FromQuery]ProductsRequestInput input)
         {
             var list = await _productDapperRepository.FindAsync(x => x.Id > 1);
 
@@ -69,10 +63,10 @@ namespace CQRS_Simple.API.Products
         }
 
         [HttpDelete]
-        [Route("delete/{productId}")]
-        public async Task<IActionResult> Delete(int productId)
+        [Route("delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            await _productDapperRepository.RemoveAsync(new Product() { Id = productId });
+            await _productDapperRepository.RemoveAsync(new Product() { Id = id });
             return Ok();
         }
 
@@ -88,10 +82,5 @@ namespace CQRS_Simple.API.Products
 
             return $"{find.Code}";
         }
-    }
-
-    public class ProductsRequestInput
-    {
-
     }
 }

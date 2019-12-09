@@ -20,7 +20,7 @@ namespace CQRS_Simple
 #endif
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.File(new RenderedCompactJsonFormatter(), "/logs/log.json")
+//                .WriteTo.File(new RenderedCompactJsonFormatter(), "/logs/log.json")
                 .CreateLogger();
 
             try
@@ -40,15 +40,14 @@ namespace CQRS_Simple
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                //                .UseSerilog()
+                .UseSerilog()
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder
-                        .UseContentRoot(Directory.GetCurrentDirectory())
-                        .UseIISIntegration()
-                        .UseStartup<Startup>()
-                        .UseSerilog();
-                });
+                                {
+                                    webBuilder
+                                        .UseContentRoot(Directory.GetCurrentDirectory())
+                                        .UseIISIntegration()
+                                        .UseStartup<Startup>();
+                                });
     }
 }

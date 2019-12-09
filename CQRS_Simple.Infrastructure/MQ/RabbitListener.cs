@@ -58,7 +58,8 @@ namespace CQRS_Simple.Infrastructure.MQ
             channel.QueueDeclare(QueueName, true, false, false, null);
 
             channel.QueueBind(queue: QueueName, exchange: "message", routingKey: RouteKey);
-            var consumer = new AsyncEventingBasicConsumer(channel);
+
+            var consumer = new EventingBasicConsumer(channel);
 
             consumer.Received += async (model, ea) =>
             {
@@ -102,6 +103,5 @@ namespace CQRS_Simple.Infrastructure.MQ
         public int Port { get; set; }
 
         public string QueryName { get; set; }
-
     }
 }
