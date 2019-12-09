@@ -22,65 +22,55 @@ namespace CQRS_Simple.Infrastructure.Dapper
 
         public async Task<T> GetByIdAsync(TC id)
         {
-            using (var db = _sqlConnectionFactory.GetOpenConnection())
-            {
-                var find = await db.QueryFirstOrDefaultAsync<T>(
-                    "SELECT * FROM " + _tableName + " WHERE Id=@Id", new { Id = id });
-                return find;
-            }
+            using var db = _sqlConnectionFactory.GetOpenConnection();
+            return await db.QueryFirstOrDefaultAsync<T>(
+                $"SELECT * FROM {_tableName} WHERE Id=@Id",
+                new {Id = id});
         }
 
         public async Task AddAsync(T item)
         {
-            using (var db = _sqlConnectionFactory.GetOpenConnection())
-            {
-                //                var parameters = (object)Mapping(item);
-                item.Id = await db.InsertAsync<TC>(_tableName, item);
-            }
+            using var db = _sqlConnectionFactory.GetOpenConnection();
+            item.Id = await db.InsertAsync<TC>(_tableName, item);
         }
 
         public async Task RemoveAsync(T item)
         {
-            using (var db = _sqlConnectionFactory.GetOpenConnection())
-            {
-                await db.ExecuteAsync("DELETE FROM " + _tableName + " WHERE Id=@Id", new { Id = item.Id });
-            }
+            using var db = _sqlConnectionFactory.GetOpenConnection();
+            await db.ExecuteAsync(
+                $"DELETE FROM {_tableName} WHERE Id=@Id",
+                new {Id = item.Id});
         }
 
-        public async Task UpdateAsync(T item)
+        public Task UpdateAsync(T item)
         {
-            using (var db = _sqlConnectionFactory.GetOpenConnection())
-            {
-                await db.UpdateAsync(_tableName, item);
-            }
-
-            await Task.CompletedTask;
+            using var db = _sqlConnectionFactory.GetOpenConnection();
+            return db.UpdateAsync(_tableName, item);
         }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {
-            IEnumerable<T> items = new List<T>();
+            IEnumerable<T> items;
             var result = DynamicQuery.GetDynamicQuery(_tableName, predicate);
             using (var db = _sqlConnectionFactory.GetOpenConnection())
             {
-                items = await db.QueryAsync<T>(result.Sql, (object)result.Param);
+                items = await db.QueryAsync<T>(result.Sql, (object) result.Param);
             }
+
             return items;
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            IEnumerable<T> items = new List<T>();
+            IEnumerable<T> items;
             using (var db = _sqlConnectionFactory.GetOpenConnection())
             {
-                items = await db.QueryAsync<T>("SELECT * FROM " + _tableName);
+                items = await db.QueryAsync<T>(
+                    $"SELECT * FROM {_tableName}"
+                );
             }
+
             return items;
         }
-
-        //        internal virtual dynamic Mapping(T item)
-        //        {
-        //            return item;
-        //        }
     }
 }
