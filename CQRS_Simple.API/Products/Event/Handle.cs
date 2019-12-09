@@ -4,6 +4,7 @@ using CQRS_Simple.Domain.Products;
 using CQRS_Simple.Dtos;
 using CQRS_Simple.Infrastructure;
 using CQRS_Simple.Infrastructure.Dapper;
+using CQRS_Simple.Infrastructure.Uow;
 using Dapper;
 using MediatR;
 
@@ -22,14 +23,17 @@ namespace CQRS_Simple.Products.Event
     public class GetProductsQueryHandle : IRequestHandler<GetProductsQuery, Product>
     {
         private readonly ISqlConnectionFactory _sqlConnectionFactory;
+        private readonly IUnitOfWork _unitOfWork;
+
         private readonly IDapperRepository<Product, int> _dapperRepository;
 
-        public GetProductsQueryHandle(ISqlConnectionFactory sqlConnectionFactory
-                        , IDapperRepository<Product, int> dapperRepository
-            )
+        public GetProductsQueryHandle(
+            ISqlConnectionFactory sqlConnectionFactory
+                        , IDapperRepository<Product, int> dapperRepository, IUnitOfWork unitOfWork)
         {
             _sqlConnectionFactory = sqlConnectionFactory;
             _dapperRepository = dapperRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public virtual async Task<Product> Handle(GetProductsQuery request, CancellationToken cancellationToken)
@@ -37,6 +41,8 @@ namespace CQRS_Simple.Products.Event
             var connection = _sqlConnectionFactory.GetOpenConnection();
 
             var p = await _dapperRepository.GetByIdAsync(request.ProductId);
+
+            _unitOfWork.PrintKey();
 
             return p;
 //            const string sql = "SELECT " +

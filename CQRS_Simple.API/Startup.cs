@@ -10,8 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using Serilog;
 
 namespace CQRS_Simple
 {
@@ -19,6 +21,8 @@ namespace CQRS_Simple
     {
         public IConfigurationRoot _configuration { get; }
         public ILifetimeScope AutofacContainer { get; private set; }
+
+        public ILoggerFactory _LoggerFactory { get; private set; }
 
         private const string SqlServerConnection = "ConnectionStrings:Default";
 
@@ -64,7 +68,9 @@ namespace CQRS_Simple
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterModule(new LoggerModule());
-            builder.RegisterModule(new InfrastructureModule(_configuration[SqlServerConnection]));
+            builder.RegisterModule(new InfrastructureModule(_configuration[SqlServerConnection]
+//                , _LoggerFactory
+                ));
             builder.RegisterModule(new MediatorModule());
             builder.RegisterModule(new AutoMapperModule());
         }
@@ -72,9 +78,13 @@ namespace CQRS_Simple
         // Configure is where you add middleware. This is called after
         // ConfigureContainer. You can use IApplicationBuilder.ApplicationServices
         // here if you need to resolve things from the container.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             this.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
+
+            _LoggerFactory = loggerFactory;
+
+//            loggerFactory.AddSerilog();
 
             if (env.IsDevelopment())
             {

@@ -1,11 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Threading.Tasks;
 
 namespace CQRS_Simple.Infrastructure.Uow
 {
     public interface IUnitOfWork : IDisposable
     {
         DbContext Context { get; }
-        void Commit();
+        int SaveChanges();
+        Task<int> SaveChangesAsync();
+        void PrintKey();
     }
 }

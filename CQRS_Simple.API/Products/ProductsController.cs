@@ -7,6 +7,8 @@ using CQRS_Simple.Domain.Products;
 using CQRS_Simple.Dtos;
 using CQRS_Simple.Infrastructure.Dapper;
 using CQRS_Simple.Infrastructure.MQ;
+using CQRS_Simple.Infrastructure.Uow;
+using CQRS_Simple.Products.Event;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -21,16 +23,19 @@ namespace CQRS_Simple.API.Products
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
         private readonly IDapperRepository<Product, int> _productDapperRepository;
+        private readonly IRepository<Product, int> _productRepository;
 
         public ProductsController(
             IMediator mediator,
             IDapperRepository<Product, int> productDapperRepository
-            , IMapper mapper, RabbitMQClient mq)
+            , IMapper mapper, RabbitMQClient mq,
+            IRepository<Product, int> productRepository)
         {
             _mediator = mediator;
             _productDapperRepository = productDapperRepository;
             _mapper = mapper;
             _mq = mq;
+            _productRepository = productRepository;
         }
 
         [HttpGet]
@@ -69,6 +74,19 @@ namespace CQRS_Simple.API.Products
         {
             await _productDapperRepository.RemoveAsync(new Product() { Id = productId });
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("test")]
+        public async Task<string> Test()
+        {
+            var find = await _productRepository.GetByIdAsync(2);
+
+            _productRepository.UnitOfWork.PrintKey();
+
+            var product = await _mediator.Send(new GetProductsQuery(2));
+
+            return $"{find.Code}";
         }
     }
 

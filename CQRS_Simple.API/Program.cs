@@ -13,7 +13,11 @@ namespace CQRS_Simple
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
+#if DEBUG
                 .MinimumLevel.Debug()
+#else
+                .MinimumLevel.Information()
+#endif
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .WriteTo.File(new RenderedCompactJsonFormatter(), "/logs/log.json")
@@ -36,7 +40,7 @@ namespace CQRS_Simple
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-//                .UseSerilog()
+                //                .UseSerilog()
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
