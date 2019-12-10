@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CQRS_Simple.API.Products.Commands;
-using CQRS_Simple.API.Products.Handlers;
 using CQRS_Simple.API.Products.Queries;
+using CQRS_Simple.Domain.Products;
 using CQRS_Simple.Domain.Products.Request;
-using CQRS_Simple.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +21,7 @@ namespace CQRS_Simple.API.Products
         public async Task<IActionResult> GetProduct(int id)
         {
             var result = await _mediator.Send(new GetProductByIdQuery(id));
-            return result != null ? (IActionResult) Ok(result) : NotFound();
+            return result != null ? (IActionResult)Ok(result) : NotFound();
         }
 
         [HttpGet]
@@ -35,13 +32,29 @@ namespace CQRS_Simple.API.Products
             return Ok(list);
         }
 
+        [HttpPost]
+        [Route("create")]
+        public async Task<IActionResult> Create([FromBody]Product input)
+        {
+            var result = await _mediator.Send(new CreateProductCommand(input));
+            return result > 0 ? (IActionResult)Ok(result) : BadRequest();
+        }
+
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _mediator.Send(new DeleteProductCommand(id));
-//            await _productDapperRepository.RemoveAsync(new Product() {Id = id});
-            return Ok();
+            var count = await _mediator.Send(new DeleteProductCommand(id));
+            return count > 0 ? (IActionResult)Ok() : NotFound();
+
+        }
+
+        [HttpPut]
+        [Route("update")]
+        public async Task<IActionResult> Update([FromBody]Product input)
+        {
+            var count = await _mediator.Send(new UpdateProductCommand(input));
+            return count > 0 ? (IActionResult)Ok() : NotFound();
         }
     }
 }

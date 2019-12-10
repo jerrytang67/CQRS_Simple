@@ -2,7 +2,7 @@
 
 namespace CQRS_Simple.API.Products.Commands
 {
-    public class DeleteProductCommand : IRequest<Unit>
+    public class DeleteProductCommand : IRequest<int>
     {
         public int ProductId { get; set; }
 

@@ -25,27 +25,27 @@ namespace CQRS_Simple.Infrastructure.Dapper
             using var db = _sqlConnectionFactory.GetOpenConnection();
             return await db.QueryFirstOrDefaultAsync<T>(
                 $"SELECT * FROM {_tableName} WHERE Id=@Id",
-                new {Id = id});
+                new { Id = id });
         }
 
-        public async Task AddAsync(T item)
+        public async Task<TC> AddAsync(T item)
         {
             using var db = _sqlConnectionFactory.GetOpenConnection();
-            item.Id = await db.InsertAsync<TC>(_tableName, item);
+            return await db.InsertAsync<TC>(_tableName, item);
         }
 
-        public async Task RemoveAsync(T item)
+        public async Task<int> RemoveAsync(T item)
         {
             using var db = _sqlConnectionFactory.GetOpenConnection();
-            await db.ExecuteAsync(
+            return await db.ExecuteAsync(
                 $"DELETE FROM {_tableName} WHERE Id=@Id",
-                new {Id = item.Id});
+                new { Id = item.Id });
         }
 
-        public Task UpdateAsync(T item)
+        public async Task<int> UpdateAsync(T item)
         {
             using var db = _sqlConnectionFactory.GetOpenConnection();
-            return db.UpdateAsync(_tableName, item);
+            return await db.UpdateAsync(_tableName, item);
         }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
@@ -54,7 +54,7 @@ namespace CQRS_Simple.Infrastructure.Dapper
             var result = DynamicQuery.GetDynamicQuery(_tableName, predicate);
             using (var db = _sqlConnectionFactory.GetOpenConnection())
             {
-                items = await db.QueryAsync<T>(result.Sql, (object) result.Param);
+                items = await db.QueryAsync<T>(result.Sql, (object)result.Param);
             }
 
             return items;

@@ -28,7 +28,7 @@ namespace CQRS_Simple.Infrastructure
                                                                 BindingFlags.Instance);
             var columns = props.Where(x => x.Name != "Id").Select(p => p.Name).ToArray();
 
-            return string.Format("INSERT INTO {0} ({1}) OUTPUT inserted.Id VALUES (@{2})",
+            return string.Format("INSERT INTO {0} ({1}) OUTPUT Inserted.Id VALUES (@{2})",
                                  tableName,
                                  string.Join(",", columns),
                                  string.Join(",@", columns));

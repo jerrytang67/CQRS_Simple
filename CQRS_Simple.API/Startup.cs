@@ -5,6 +5,7 @@ using CQRS_Simple.Domain.Products;
 using CQRS_Simple.EntityFrameworkCore;
 using CQRS_Simple.Infrastructure.MQ;
 using CQRS_Simple.Modules;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -54,6 +55,9 @@ namespace CQRS_Simple
                 .AddNewtonsoftJson(c => { c.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver(); })
                 .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<ProductValidator>())
                 ;
+
+            //inject into ValidationBehavior
+            services.AddValidatorsFromAssembly(typeof(Startup).Assembly);
 
             services.AddDbContext<SimpleDbContext>(options =>
                 options.UseSqlServer(_configuration[SqlServerConnection]));

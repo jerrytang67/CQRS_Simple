@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+    <LangVersion>8</LangVersion>
     <IsPackable>false</IsPackable>
     <SpaRoot>ClientApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
@@ -35,11 +36,6 @@
     <ProjectReference Include="..\CQRS_Simple.Domain\CQRS_Simple.Domain.csproj" />
     <ProjectReference Include="..\CQRS_Simple.EntityFrameworkCore\CQRS_Simple.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\CQRS_Simple.Infrastructure\CQRS_Simple.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Products\Event" />
-    <Folder Include="Products\Validations" />
   </ItemGroup>
 
 </Project>

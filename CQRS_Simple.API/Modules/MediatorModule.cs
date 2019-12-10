@@ -5,6 +5,7 @@ using System.Reflection;
 using Autofac;
 using Autofac.Core;
 using Autofac.Features.Variance;
+using CQRS_Simple.PipelineBehaviors;
 using FluentValidation;
 using MediatR;
 using MediatR.Pipeline;
@@ -23,7 +24,7 @@ namespace CQRS_Simple.Modules
 
             builder.RegisterAssemblyTypes(typeof(IMediator).GetTypeInfo().Assembly).AsImplementedInterfaces();
 
-            var mediatrOpenTypes = new[] {typeof(IRequestHandler<,>), typeof(INotificationHandler<>), typeof(IValidator<>),};
+            var mediatrOpenTypes = new[] { typeof(IRequestHandler<,>), typeof(INotificationHandler<>), typeof(IValidator<>), };
 
             foreach (var mediatrOpenType in mediatrOpenTypes)
             {
@@ -33,8 +34,11 @@ namespace CQRS_Simple.Modules
                     .AsImplementedInterfaces();
             }
 
+
             builder.RegisterGeneric(typeof(RequestPostProcessorBehavior<,>)).As(typeof(IPipelineBehavior<,>));
             builder.RegisterGeneric(typeof(RequestPreProcessorBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+
+            builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
             builder.Register<ServiceFactory>(ctx =>
             {

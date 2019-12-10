@@ -8,22 +8,22 @@ using MediatR;
 
 namespace CQRS_Simple.API.Products.Handlers
 {
-    public class DeleteProductHandle : IRequestHandler<DeleteProductCommand, int>
+    public class UpdateProductHandle : IRequestHandler<UpdateProductCommand, int>
     {
         private readonly IDapperRepository<Product, int> _dapperRepository;
         private readonly RabbitMQClient _mq;
 
-        public DeleteProductHandle(IDapperRepository<Product, int> dapperRepository, RabbitMQClient mq)
+        public UpdateProductHandle(IDapperRepository<Product, int> dapperRepository, RabbitMQClient mq)
         {
             _dapperRepository = dapperRepository;
             _mq = mq;
         }
 
-        public async Task<int> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
-            var result = await _dapperRepository.RemoveAsync(new Product() { Id = request.ProductId });
+            var result = await _dapperRepository.UpdateAsync(request.Product);
             if (result > 0)
-                _mq.PushMessage(new RabbitData(typeof(DeleteProductCommand), request));
+                _mq.PushMessage(new RabbitData(typeof(UpdateProductCommand), request));
             return result;
         }
     }

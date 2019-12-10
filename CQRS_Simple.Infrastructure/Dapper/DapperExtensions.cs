@@ -14,6 +14,11 @@ namespace CQRS_Simple.Infrastructure.Dapper
             return result.First();
         }
 
-        public static async Task UpdateAsync(this IDbConnection db, string tableName, object param) { await db.ExecuteAsync(DynamicQuery.GetUpdateQuery(tableName, param), param); }
+        public static async Task<int> UpdateAsync(
+            this IDbConnection db,
+            string tableName, object param)
+        {
+            return await db.ExecuteAsync(DynamicQuery.GetUpdateQuery(tableName, param), param);
+        }
     }
 }
