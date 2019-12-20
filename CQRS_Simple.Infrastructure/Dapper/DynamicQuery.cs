@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace CQRS_Simple.Infrastructure
+namespace CQRS_Simple.Infrastructure.Dapper
 {
     /// <summary>
     /// Dynamic query class.

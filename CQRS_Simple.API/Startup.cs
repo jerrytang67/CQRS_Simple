@@ -3,6 +3,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CQRS_Simple.Domain.Products;
 using CQRS_Simple.EntityFrameworkCore;
+using CQRS_Simple.Infrastructure;
 using CQRS_Simple.Infrastructure.MQ;
 using CQRS_Simple.Modules;
 using FluentValidation;
@@ -72,11 +73,14 @@ namespace CQRS_Simple
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterModule(new LoggerModule());
-            builder.RegisterModule(new InfrastructureModule(_configuration[SqlServerConnection]
-                //                , _LoggerFactory
-                ));
+
+            builder.RegisterModule(new InfrastructureModule(_configuration[SqlServerConnection]));
+
             builder.RegisterModule(new MediatorModule());
+
             builder.RegisterModule(new AutoMapperModule());
+
+            builder.RegisterModule(new IocManagerModule());
         }
 
         // Configure is where you add middleware. This is called after
@@ -84,9 +88,11 @@ namespace CQRS_Simple
         // here if you need to resolve things from the container.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            this.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
+            //this.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
 
-            _LoggerFactory = loggerFactory;
+            IocManager.Instance.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
+
+            //_LoggerFactory = loggerFactory;
 
             loggerFactory.AddSerilog();
 

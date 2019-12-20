@@ -3,8 +3,11 @@ using CQRS_Simple.API.Products.Commands;
 using CQRS_Simple.API.Products.Queries;
 using CQRS_Simple.Domain.Products;
 using CQRS_Simple.Domain.Products.Request;
+using CQRS_Simple.Infrastructure;
+using CQRS_Simple.Infrastructure.Uow;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace CQRS_Simple.API.Products
 {
@@ -13,14 +16,23 @@ namespace CQRS_Simple.API.Products
     public class ProductsController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IIocManager _iocManager;
 
-        public ProductsController(IMediator mediator) { _mediator = mediator; }
+        public ProductsController(IMediator mediator, IIocManager iocManager)
+        {
+            _mediator = mediator;
+            _iocManager = iocManager;
+        }
 
         [HttpGet]
         [Route("getProduct/{id}")]
         public async Task<IActionResult> GetProduct(int id)
         {
             var result = await _mediator.Send(new GetProductByIdQuery(id));
+           var s = _iocManager.GetInstance<IRepository<Product, int>>();
+
+            Log.Information((await s.GetByIdAsync(12)).Name);
+
             return result != null ? (IActionResult)Ok(result) : NotFound();
         }
 
