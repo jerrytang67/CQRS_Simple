@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CQRS_Simple.Domain.Products;
@@ -91,8 +92,10 @@ namespace CQRS_Simple
         {
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();
             //IIocManager register as singleton
-            var iocInstance = AutofacContainer.Resolve<IIocManager>();
-            iocInstance.AutofacContainer  = app.ApplicationServices.GetAutofacRoot();
+            // var iocInstance = AutofacContainer.Resolve<IIocManager>();
+            // iocInstance.AutofacContainer  = app.ApplicationServices.GetAutofacRoot();
+
+            //IocManager.Instance.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
 
             //loggerFactory.AddSerilog();
 

@@ -17,7 +17,7 @@ namespace CQRS_Simple.API.Products
     {
         private readonly IMediator _mediator;
         private readonly IIocManager _iocManager;
-        private readonly IRepository<Product, int> _repository;
+        private IRepository<Product, int> _repository;
 
         public ProductsController(IMediator mediator, IIocManager iocManager, IRepository<Product, int> repository)
         {
@@ -27,24 +27,30 @@ namespace CQRS_Simple.API.Products
         }
 
         [HttpGet]
-        [Route("getProduct/{id}")]
+        [Route("GetProduct/{id}")]
         public async Task<IActionResult> GetProduct(int id)
         {
             var result = await _mediator.Send(new GetProductByIdQuery(id));
-            // var _repository = _iocManager.GetInstance<IRepository<Product, int>>();
+
+            // _repository = _iocManager.GetInstance<IRepository<Product, int>>();
 
             _repository.UnitOfWork.PrintKey();
 
-            var find = await _repository.GetByIdAsync(12);
+            var find = await _repository.GetByIdAsync(id);
 
-            Log.Information(find.Name);
-            find.Name += "1";
+
+            if(find!=null)
+            {
+                Log.Information(find?.Name);
+                find.Name += "1";
+            }
+
 
             return result != null ? (IActionResult)Ok(result) : NotFound();
         }
 
         [HttpGet]
-        [Route("getAll")]
+        [Route("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] ProductsRequestInput input)
         {
             var list = await _mediator.Send(new GetProductsQuery(input));
@@ -52,7 +58,7 @@ namespace CQRS_Simple.API.Products
         }
 
         [HttpPost]
-        [Route("create")]
+        [Route("Create")]
         public async Task<IActionResult> Create([FromBody]Product input)
         {
             var result = await _mediator.Send(new CreateProductCommand(input));
@@ -60,7 +66,7 @@ namespace CQRS_Simple.API.Products
         }
 
         [HttpDelete]
-        [Route("delete/{id}")]
+        [Route("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var count = await _mediator.Send(new DeleteProductCommand(id));
@@ -69,7 +75,7 @@ namespace CQRS_Simple.API.Products
         }
 
         [HttpPut]
-        [Route("update")]
+        [Route("Update")]
         public async Task<IActionResult> Update([FromBody]Product input)
         {
             var count = await _mediator.Send(new UpdateProductCommand(input));
