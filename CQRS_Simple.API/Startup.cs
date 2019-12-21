@@ -72,6 +72,8 @@ namespace CQRS_Simple
         // Don't build the container; that gets done for you by the factory.
         public void ConfigureContainer(ContainerBuilder builder)
         {
+            builder.RegisterModule(new IocManagerModule());
+
             builder.RegisterModule(new LoggerModule());
 
             builder.RegisterModule(new InfrastructureModule(_configuration[SqlServerConnection]));
@@ -80,7 +82,6 @@ namespace CQRS_Simple
 
             builder.RegisterModule(new AutoMapperModule());
 
-            builder.RegisterModule(new IocManagerModule());
         }
 
         // Configure is where you add middleware. This is called after
@@ -88,13 +89,12 @@ namespace CQRS_Simple
         // here if you need to resolve things from the container.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            //this.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
+            AutofacContainer = app.ApplicationServices.GetAutofacRoot();
+            //IIocManager register as singleton
+            var iocInstance = AutofacContainer.Resolve<IIocManager>();
+            iocInstance.AutofacContainer  = app.ApplicationServices.GetAutofacRoot();
 
-            IocManager.Instance.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
-
-            //_LoggerFactory = loggerFactory;
-
-            loggerFactory.AddSerilog();
+            //loggerFactory.AddSerilog();
 
             if (env.IsDevelopment())
             {

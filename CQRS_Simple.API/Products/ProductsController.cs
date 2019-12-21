@@ -17,11 +17,13 @@ namespace CQRS_Simple.API.Products
     {
         private readonly IMediator _mediator;
         private readonly IIocManager _iocManager;
+        private readonly IRepository<Product, int> _repository;
 
-        public ProductsController(IMediator mediator, IIocManager iocManager)
+        public ProductsController(IMediator mediator, IIocManager iocManager, IRepository<Product, int> repository)
         {
             _mediator = mediator;
             _iocManager = iocManager;
+            _repository = repository;
         }
 
         [HttpGet]
@@ -29,9 +31,14 @@ namespace CQRS_Simple.API.Products
         public async Task<IActionResult> GetProduct(int id)
         {
             var result = await _mediator.Send(new GetProductByIdQuery(id));
-           var s = _iocManager.GetInstance<IRepository<Product, int>>();
+            // var _repository = _iocManager.GetInstance<IRepository<Product, int>>();
 
-            Log.Information((await s.GetByIdAsync(12)).Name);
+            _repository.UnitOfWork.PrintKey();
+
+            var find = await _repository.GetByIdAsync(12);
+
+            Log.Information(find.Name);
+            find.Name += "1";
 
             return result != null ? (IActionResult)Ok(result) : NotFound();
         }

@@ -5,7 +5,7 @@ using Serilog;
 
 namespace CQRS_Simple.Infrastructure.Uow
 {
-    public class UnitOfWork : IUnitOfWork, IDisposable
+    public class UnitOfWork : IUnitOfWork
     {
         private Guid KEY { get; }
 
@@ -16,7 +16,7 @@ namespace CQRS_Simple.Infrastructure.Uow
             Context = context;
             KEY = Guid.NewGuid();
 #if DEBUG
-            Console.WriteLine($"UnitOfWork Init {KEY}");
+            Log.Information($"UnitOfWork Init {KEY}");
 #endif
         }
         public int SaveChanges()
@@ -34,10 +34,26 @@ namespace CQRS_Simple.Infrastructure.Uow
             Log.Information($"PrintKey:{KEY}");
         }
 
+        /// <summary>
+        /// 手动清理
+        /// </summary>
+        public void CleanUp()
+        {
+            Context?.SaveChanges();
+            Context?.Dispose();
+
+#if DEBUG
+            Log.Information($"Context CleanUp");
+#endif
+        }
+
         public void Dispose()
         {
             Context?.Dispose();
+#if DEBUG
             Log.Information($"Context Dispose");
+
+#endif
         }
     }
 }

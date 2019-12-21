@@ -9,7 +9,8 @@ namespace CQRS_Simple.Modules
         {
             builder.RegisterType<IocManager>()
                 .As<IIocManager>()
-                .InstancePerLifetimeScope();
+                .SingleInstance()
+                ;
         }
     }
 }

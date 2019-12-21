@@ -46,7 +46,9 @@ namespace CQRS_Simple.Modules
 
             builder.RegisterType<UnitOfWork>()
                 .As<IUnitOfWork>()
-                .InstancePerLifetimeScope();
+                .InstancePerLifetimeScope()
+                .OnRelease( instance => instance.CleanUp() )
+                ;
 
             builder.RegisterGeneric(typeof(Repository<,>)).As(typeof(IRepository<,>))
                 .InstancePerLifetimeScope();
