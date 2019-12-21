@@ -7,10 +7,10 @@ namespace CQRS_Simple.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<IocManager>()
-                .As<IIocManager>()
-                .SingleInstance()
-                ;
+            // builder.RegisterType<IocManager>()
+            //     .As<IIocManager>()
+            //     .SingleInstance()
+            //     ;
         }
     }
 }

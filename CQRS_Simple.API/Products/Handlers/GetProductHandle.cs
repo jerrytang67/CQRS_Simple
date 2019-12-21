@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
 using AutoMapper;
 using CQRS_Simple.API.Products.Queries;
 using CQRS_Simple.Domain.Products;
 using CQRS_Simple.Dtos;
 using CQRS_Simple.Infrastructure.Dapper;
+using CQRS_Simple.Infrastructure.Uow;
 using MediatR;
 
 namespace CQRS_Simple.API.Products.Handlers
@@ -15,17 +17,28 @@ namespace CQRS_Simple.API.Products.Handlers
     {
         private readonly IDapperRepository<Product, int> _dapperRepository;
         private readonly IMapper _mapper;
+        private readonly ILifetimeScope _container;
 
         public GetProductsQueryHandle(IDapperRepository<Product, int> dapperRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ILifetimeScope container
+            )
         {
             _dapperRepository = dapperRepository;
             _mapper = mapper;
+            _container = container;
         }
 
         public virtual async Task<ProductDto> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _dapperRepository.GetByIdAsync(request.ProductId);
+
+            var _repository = _container.Resolve<IRepository<Product, int>>();
+
+            _repository.UnitOfWork.PrintKey();
+
+            var s = await _repository.GetByIdAsync(request.ProductId);
+            s.Name += "2";
 
             return result == null ? null : _mapper.Map<ProductDto>(result);
         }

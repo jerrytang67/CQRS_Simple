@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Autofac;
 using CQRS_Simple.API.Products.Commands;
 using CQRS_Simple.API.Products.Queries;
 using CQRS_Simple.Domain.Products;
@@ -16,14 +17,12 @@ namespace CQRS_Simple.API.Products
     public class ProductsController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IIocManager _iocManager;
-        private IRepository<Product, int> _repository;
+        private readonly ILifetimeScope _container;
 
-        public ProductsController(IMediator mediator, IIocManager iocManager, IRepository<Product, int> repository)
+        public ProductsController(IMediator mediator, ILifetimeScope container)
         {
             _mediator = mediator;
-            _iocManager = iocManager;
-            _repository = repository;
+            _container = container;
         }
 
         [HttpGet]
@@ -32,19 +31,21 @@ namespace CQRS_Simple.API.Products
         {
             var result = await _mediator.Send(new GetProductByIdQuery(id));
 
-            // _repository = _iocManager.GetInstance<IRepository<Product, int>>();
+            var _repository = _container.Resolve<IRepository<Product, int>>();
 
             _repository.UnitOfWork.PrintKey();
 
+            var _repository2 = _container.Resolve<IRepository<Product, int>>();
+
+            _repository2.UnitOfWork.PrintKey();
+
             var find = await _repository.GetByIdAsync(id);
 
-
-            if(find!=null)
+            if (find != null)
             {
+                find.Name += "1_";
                 Log.Information(find?.Name);
-                find.Name += "1";
             }
-
 
             return result != null ? (IActionResult)Ok(result) : NotFound();
         }

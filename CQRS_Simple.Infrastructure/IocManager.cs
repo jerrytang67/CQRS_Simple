@@ -12,12 +12,10 @@ namespace CQRS_Simple.Infrastructure
 
     public class IocManager : IIocManager
     {
-        static IocManager()
+        public IocManager(ILifetimeScope container)
         {
-            Instance = new IocManager();
+            AutofacContainer = container;
         }
-        public static IocManager Instance { get; private set; }
-
         /// <summary>
         /// Autofac容器
         /// </summary>
@@ -25,7 +23,8 @@ namespace CQRS_Simple.Infrastructure
 
         public TService GetInstance<TService>()
         {
-            return Instance.AutofacContainer.Resolve<TService>();
+            return AutofacContainer.Resolve<TService>();
         }
+
     }
 }

@@ -91,11 +91,7 @@ namespace CQRS_Simple
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();
-            //IIocManager register as singleton
-            // var iocInstance = AutofacContainer.Resolve<IIocManager>();
-            // iocInstance.AutofacContainer  = app.ApplicationServices.GetAutofacRoot();
 
-            //IocManager.Instance.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
 
             //loggerFactory.AddSerilog();
 

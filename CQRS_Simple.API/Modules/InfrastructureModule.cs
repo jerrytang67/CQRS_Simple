@@ -27,9 +27,9 @@ namespace CQRS_Simple.Modules
             builder.RegisterType<RabbitMQClient>()
                 .SingleInstance();
 
-            builder.RegisterType<SqlConnectionFactory>()
+            builder.Register(c => new SqlConnectionFactory(_databaseConnectionString))
                 .As<ISqlConnectionFactory>()
-                .WithParameter("connectionString", _databaseConnectionString)
+                // .WithParameter("connectionString", _databaseConnectionString)
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(DapperRepository<,>)).As(typeof(IDapperRepository<,>))
@@ -37,17 +37,17 @@ namespace CQRS_Simple.Modules
 
             var dbBuild = new DbContextOptionsBuilder<SimpleDbContext>();
             dbBuild.UseSqlServer(_databaseConnectionString);
+
             //            dbBuild.UseLoggerFactory(_loggerFactory);
 
-            builder.RegisterType<SimpleDbContext>()
+            builder.Register(c => new SimpleDbContext(dbBuild.Options))
                 .As<DbContext>()
-                .WithParameter("options", dbBuild.Options)
                 .InstancePerLifetimeScope();
 
             builder.RegisterType<UnitOfWork>()
                 .As<IUnitOfWork>()
                 .InstancePerLifetimeScope()
-                .OnRelease( instance => instance.CleanUp() )
+                .OnRelease(instance => instance.CleanUp())
                 ;
 
             builder.RegisterGeneric(typeof(Repository<,>)).As(typeof(IRepository<,>))
