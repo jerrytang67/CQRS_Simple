@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Autofac;
 using CQRS_Simple.API.Products.Commands;
 using CQRS_Simple.API.Products.Queries;
@@ -36,18 +37,16 @@ namespace CQRS_Simple.API.Products
             var result = await _mediator.Send(new GetProductByIdQuery(id));
 
             var _r1 = _unitOfWork.GetRepository<Product, int>();
-
             _r1.UnitOfWork.PrintKey();
 
-            var _repository = _iocManager.GetInstance<IRepository<Product, int>>();
-            // var _repository = _container.Resolve<IRepository<Product, int>>();
 
+            var _repository = _iocManager.GetInstance<IRepository<Product, int>>();
             _repository.UnitOfWork.PrintKey();
 
-            var _repository2 = _iocManager.GetInstance<IRepository<Product, int>>();
-            // var _repository2 = _container.Resolve<IRepository<Product, int>>();
 
+            var _repository2 = _iocManager.GetInstance<IRepository<Product, int>>();
             _repository2.UnitOfWork.PrintKey();
+
 
             var find = await _repository.GetByIdAsync(id);
 
@@ -55,7 +54,10 @@ namespace CQRS_Simple.API.Products
             {
                 find.Name += "1_";
                 Log.Information(find?.Name);
+                await _unitOfWork.SaveChangesAsync();
             }
+
+            // throw new Exception("ss");
 
             return result != null ? (IActionResult)Ok(result) : NotFound();
         }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Serilog;
 
 namespace CQRS_Simple.Infrastructure.Uow
@@ -12,10 +14,15 @@ namespace CQRS_Simple.Infrastructure.Uow
 
         public DbContext Context { get; }
 
-        public UnitOfWork(DbContext context , IIocManager iocManager)
+        public IDbContextTransaction Transaction;
+
+        public UnitOfWork(DbContext context, IIocManager iocManager)
         {
             _iocManager = iocManager;
             Context = context;
+
+            Transaction = context.Database.BeginTransaction();
+
             KEY = Guid.NewGuid();
 #if DEBUG
             Log.Information($"UnitOfWork Init {KEY}");
@@ -26,9 +33,9 @@ namespace CQRS_Simple.Infrastructure.Uow
             return Context.SaveChanges();
         }
 
-        public Task<int> SaveChangesAsync()
+        public async Task<int> SaveChangesAsync()
         {
-            return Context.SaveChangesAsync();
+            return await CommitAsync();
         }
 
         public IRepository<T, TC> GetRepository<T, TC>() where T : Entity<TC>
@@ -46,13 +53,56 @@ namespace CQRS_Simple.Infrastructure.Uow
         /// </summary>
         public void CleanUp()
         {
-            Context?.SaveChanges();
+            Commit();
+
+            Transaction?.Dispose();
             Context?.Dispose();
 
 #if DEBUG
             Log.Information($"Context CleanUp");
 #endif
         }
+
+
+        private int Commit()
+        {
+            var result = 0;
+            try
+            {
+                result = Context.SaveChanges();
+                Transaction?.Commit();
+                return result;
+            }
+            catch (Exception e)
+            {
+                result = -1;
+                Transaction?.Rollback();
+                Log.Error("Context Transaction Error");
+                Log.Error(e.Message);
+            }
+            return result;
+        }
+        private async Task<int> CommitAsync()
+        {
+            var result = 0;
+            try
+            {
+                result = await Context.SaveChangesAsync();
+                Transaction?.Commit();
+                return result;
+            }
+            catch (Exception e)
+            {
+                result = -1;
+                if (Transaction != null)
+                    await Transaction.RollbackAsync();
+                Log.Error("Context Transaction Error");
+                Log.Error(e.Message);
+            }
+            return result;
+        }
+
+
 
         public void Dispose()
         {
