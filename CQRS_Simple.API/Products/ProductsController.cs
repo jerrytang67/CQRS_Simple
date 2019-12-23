@@ -18,11 +18,13 @@ namespace CQRS_Simple.API.Products
     {
         private readonly IMediator _mediator;
         private readonly ILifetimeScope _container;
+        private readonly IIocManager _iocManager;
 
-        public ProductsController(IMediator mediator, ILifetimeScope container)
+        public ProductsController(IMediator mediator, ILifetimeScope container, IIocManager iocManager)
         {
             _mediator = mediator;
             _container = container;
+            _iocManager = iocManager;
         }
 
         [HttpGet]
@@ -31,11 +33,13 @@ namespace CQRS_Simple.API.Products
         {
             var result = await _mediator.Send(new GetProductByIdQuery(id));
 
-            var _repository = _container.Resolve<IRepository<Product, int>>();
+            var _repository = _iocManager.GetInstance<IRepository<Product, int>>();
+            // var _repository = _container.Resolve<IRepository<Product, int>>();
 
             _repository.UnitOfWork.PrintKey();
 
-            var _repository2 = _container.Resolve<IRepository<Product, int>>();
+            var _repository2 = _iocManager.GetInstance<IRepository<Product, int>>();
+            // var _repository2 = _container.Resolve<IRepository<Product, int>>();
 
             _repository2.UnitOfWork.PrintKey();
 

@@ -7,10 +7,13 @@ namespace CQRS_Simple.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            // builder.RegisterType<IocManager>()
-            //     .As<IIocManager>()
-            //     .SingleInstance()
-            //     ;
+            builder.Register(c =>
+                {
+                    var scope = c.Resolve<ILifetimeScope>();
+                    return new IocManager(scope);
+                })
+                .As<IIocManager>()
+                ;
         }
     }
 }

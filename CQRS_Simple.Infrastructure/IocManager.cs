@@ -25,6 +25,5 @@ namespace CQRS_Simple.Infrastructure
         {
             return AutofacContainer.Resolve<TService>();
         }
-
     }
 }

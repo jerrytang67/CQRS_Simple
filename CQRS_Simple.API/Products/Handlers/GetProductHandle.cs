@@ -6,6 +6,7 @@ using AutoMapper;
 using CQRS_Simple.API.Products.Queries;
 using CQRS_Simple.Domain.Products;
 using CQRS_Simple.Dtos;
+using CQRS_Simple.Infrastructure;
 using CQRS_Simple.Infrastructure.Dapper;
 using CQRS_Simple.Infrastructure.Uow;
 using MediatR;
@@ -34,6 +35,7 @@ namespace CQRS_Simple.API.Products.Handlers
             var result = await _dapperRepository.GetByIdAsync(request.ProductId);
 
             var _repository = _container.Resolve<IRepository<Product, int>>();
+           // var _repository = _iocManager.GetInstance<IRepository<Product, int>>();
 
             _repository.UnitOfWork.PrintKey();
 
