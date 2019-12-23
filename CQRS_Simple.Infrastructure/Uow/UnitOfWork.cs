@@ -7,12 +7,14 @@ namespace CQRS_Simple.Infrastructure.Uow
 {
     public class UnitOfWork : IUnitOfWork
     {
+        private readonly IIocManager _iocManager;
         private Guid KEY { get; }
 
         public DbContext Context { get; }
 
-        public UnitOfWork(DbContext context)
+        public UnitOfWork(DbContext context , IIocManager iocManager)
         {
+            _iocManager = iocManager;
             Context = context;
             KEY = Guid.NewGuid();
 #if DEBUG
@@ -27,6 +29,11 @@ namespace CQRS_Simple.Infrastructure.Uow
         public Task<int> SaveChangesAsync()
         {
             return Context.SaveChangesAsync();
+        }
+
+        public IRepository<T, TC> GetRepository<T, TC>() where T : Entity<TC>
+        {
+            return _iocManager.GetInstance<IRepository<T, TC>>();
         }
 
         public void PrintKey()

@@ -9,6 +9,8 @@ namespace CQRS_Simple.Infrastructure.Uow
         DbContext Context { get; }
         int SaveChanges();
         Task<int> SaveChangesAsync();
+
+        IRepository<T, TC> GetRepository<T, TC>() where T : Entity<TC>;
         void PrintKey();
     }
 }
