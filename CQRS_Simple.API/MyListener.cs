@@ -7,6 +7,7 @@ namespace CQRS_Simple
     public class MyListener : RabbitListener
     {
         private readonly RabbitMQOptions _options;
+
         public MyListener(IOptions<RabbitMQOptions> optionsAccessor)
             : base(optionsAccessor)
         {
