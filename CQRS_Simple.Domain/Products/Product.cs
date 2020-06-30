@@ -15,6 +15,7 @@ namespace CQRS_Simple.Domain.Products
         public string Code { get; set; }
 
         public string Description { get; set; }
+
     }
 
     public class ProductValidator : AbstractValidator<Product>

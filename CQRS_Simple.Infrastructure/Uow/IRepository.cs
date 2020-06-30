@@ -15,5 +15,7 @@ namespace CQRS_Simple.Infrastructure.Uow
         void Add(T entity);
         void Delete(T entity);
         void Update(T entity);
+        
+        Task<IEnumerable<T>> GetAllAsync();
     }
 }

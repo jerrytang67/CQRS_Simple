@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
@@ -16,11 +17,12 @@ namespace CQRS_Simple.API.Products.Handlers
     public class GetProductsQueryHandle : IRequestHandler<GetProductByIdQuery, ProductDto>,
         IRequestHandler<GetProductsQuery, List<ProductDto>>
     {
-        private readonly IDapperRepository<Product, int> _dapperRepository;
+        // private readonly IDapperRepository<Product, int> _dapperRepository;
+        private readonly IRepository<Product, int> _dapperRepository;
         private readonly IMapper _mapper;
         private readonly ILifetimeScope _container;
 
-        public GetProductsQueryHandle(IDapperRepository<Product, int> dapperRepository,
+        public GetProductsQueryHandle(IRepository<Product, int> dapperRepository,
             IMapper mapper,
             ILifetimeScope container
             )
@@ -34,12 +36,12 @@ namespace CQRS_Simple.API.Products.Handlers
         {
             var result = await _dapperRepository.GetByIdAsync(request.ProductId);
 
-            var _repository = _container.Resolve<IRepository<Product, int>>();
+            var repository = _container.Resolve<IRepository<Product, int>>();
            // var _repository = _iocManager.GetInstance<IRepository<Product, int>>();
 
-            _repository.UnitOfWork.PrintKey();
+            repository.UnitOfWork.PrintKey();
 
-            var s = await _repository.GetByIdAsync(request.ProductId);
+            var s = await repository.GetByIdAsync(request.ProductId);
             s.Name += "2";
 
             return result == null ? null : _mapper.Map<ProductDto>(result);

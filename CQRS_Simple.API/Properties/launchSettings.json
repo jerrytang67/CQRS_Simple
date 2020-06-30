@@ -18,6 +18,7 @@
     "CQRS_Simple": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "swagger/index.html",
       "applicationUrl": "http://localhost:21020",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

@@ -1,13 +1,14 @@
 using System;
-using System.Collections.Generic;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Autofac.Extras.DynamicProxy;
+using Castle.DynamicProxy;
 using CQRS_Simple.Domain.Products;
 using CQRS_Simple.EntityFrameworkCore;
 using CQRS_Simple.Infrastructure;
 using CQRS_Simple.Infrastructure.MQ;
+using CQRS_Simple.Infrastructure.Uow;
 using CQRS_Simple.Modules;
-using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,7 +19,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
-using Serilog;
 
 namespace CQRS_Simple
 {
@@ -51,15 +51,15 @@ namespace CQRS_Simple
             services.AddHostedService<MyListener>();
 
             services.AddControllersWithViews(option =>
-            {
-                option.AllowEmptyInputInBodyModelBinding = true; // false as Default
-            })
+                {
+                    option.AllowEmptyInputInBodyModelBinding = true; // false as Default
+                })
                 .AddNewtonsoftJson(c => { c.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver(); })
                 .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<ProductValidator>())
                 ;
 
             //inject into ValidationBehavior
-            services.AddValidatorsFromAssembly(typeof(Startup).Assembly);
+            //services.AddValidatorsFromAssembly(typeof(Startup).Assembly);
 
             services.AddDbContext<SimpleDbContext>(options =>
                 options.UseSqlServer(_configuration[SqlServerConnection]));
@@ -73,6 +73,10 @@ namespace CQRS_Simple
         // Don't build the container; that gets done for you by the factory.
         public void ConfigureContainer(ContainerBuilder builder)
         {
+            
+            // 类型注入
+            builder.Register(c => new CallLogger(Console.Out));
+            
             builder.RegisterModule(new IocManagerModule());
 
             builder.RegisterModule(new LoggerModule());
@@ -121,17 +125,13 @@ namespace CQRS_Simple
             });
 
             ConfigureSwagger(app);
-
         }
 
         private static void ConfigureSwagger(IApplicationBuilder app)
         {
             app.UseSwagger();
 
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sample CQRS API V1");
-            });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sample CQRS API V1"); });
         }
 
         private void AddSwagger(IServiceCollection services)
@@ -146,7 +146,6 @@ namespace CQRS_Simple
                     TermsOfService = new Uri("https://somall.top/about")
                 });
                 options.DocInclusionPredicate((docName, description) => true);
-
             });
         }
     }

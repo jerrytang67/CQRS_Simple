@@ -51,5 +51,10 @@ namespace CQRS_Simple.Infrastructure.Uow
             _unitOfWork.Context.Entry(entity).State = EntityState.Modified;
             _unitOfWork.Context.Set<T>().Attach(entity);
         }
+
+        public async Task<IEnumerable<T>> GetAllAsync()
+        {
+            return await _unitOfWork.Context.Set<T>().ToListAsync();
+        }
     }
 }

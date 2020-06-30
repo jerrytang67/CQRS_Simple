@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Autofac;
 using CQRS_Simple.API.Products.Commands;
@@ -18,20 +19,18 @@ namespace CQRS_Simple.API.Products
     public class ProductsController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly ILifetimeScope _container;
         private readonly IIocManager _iocManager;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProductsController(IMediator mediator, ILifetimeScope container, IIocManager iocManager, IUnitOfWork unitOfWork)
+        public ProductsController(IMediator mediator,  IIocManager iocManager, IUnitOfWork unitOfWork)
         {
             _mediator = mediator;
-            _container = container;
             _iocManager = iocManager;
             _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
-        [Route("GetProduct/{id}")]
+        [Route("GetProduct")]
         public async Task<IActionResult> GetProduct(int id)
         {
             var result = await _mediator.Send(new GetProductByIdQuery(id));
@@ -67,6 +66,9 @@ namespace CQRS_Simple.API.Products
         public async Task<IActionResult> GetAll([FromQuery] ProductsRequestInput input)
         {
             var list = await _mediator.Send(new GetProductsQuery(input));
+
+            Debugger.Break();
+
             return Ok(list);
         }
 
@@ -84,7 +86,6 @@ namespace CQRS_Simple.API.Products
         {
             var count = await _mediator.Send(new DeleteProductCommand(id));
             return count > 0 ? (IActionResult)Ok() : NotFound();
-
         }
 
         [HttpPut]

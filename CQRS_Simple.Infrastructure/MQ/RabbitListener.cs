@@ -48,7 +48,7 @@ namespace CQRS_Simple.Infrastructure.MQ
             await Task.CompletedTask;
         }
 
-        protected string QueueName;
+        protected string QueueName= "QueueName";
         protected string RouteKey;
 
         // 处理消息的方法
@@ -64,7 +64,7 @@ namespace CQRS_Simple.Infrastructure.MQ
             consumer.Received += async (model, ea) =>
             {
                 var body = ea.Body;
-                var message = Encoding.UTF8.GetString(body);
+                var message = Encoding.UTF8.GetString(body.ToArray());
                 var result = await ProcessAsync(message);
                 Log.Information($"收到消息： {message} routerKey: { ea.RoutingKey}");
                 if (result)
@@ -93,15 +93,10 @@ namespace CQRS_Simple.Infrastructure.MQ
 
     public class RabbitMQOptions
     {
-        public RabbitMQOptions()
-        {
-        }
-
         public string UserName { get; set; }
         public string Password { get; set; }
         public string HostName { get; set; }
         public int Port { get; set; }
-
         public string QueryName { get; set; }
     }
 }

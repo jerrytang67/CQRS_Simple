@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Autofac.Extras.DynamicProxy;
 using CQRS_Simple.EntityFrameworkCore;
 using CQRS_Simple.Infrastructure;
 using CQRS_Simple.Infrastructure.Dapper;
@@ -15,8 +16,7 @@ namespace CQRS_Simple.Modules
         //        private readonly ILoggerFactory _loggerFactory;
 
         public InfrastructureModule(string databaseConnectionString
-            //            , ILoggerFactory loggerFactory
-            )
+        )
         {
             this._databaseConnectionString = databaseConnectionString;
             //            _loggerFactory = loggerFactory;
@@ -24,8 +24,7 @@ namespace CQRS_Simple.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<RabbitMQClient>()
-                .SingleInstance();
+            builder.RegisterType<RabbitMQClient>().SingleInstance();
 
             builder.Register(c => new SqlConnectionFactory(_databaseConnectionString))
                 .As<ISqlConnectionFactory>()
@@ -51,7 +50,10 @@ namespace CQRS_Simple.Modules
                 ;
 
             builder.RegisterGeneric(typeof(Repository<,>)).As(typeof(IRepository<,>))
-                .InstancePerLifetimeScope();
+                .InstancePerLifetimeScope()
+                .InterceptedBy(typeof(CallLogger))
+                .EnableInterfaceInterceptors();
+            ;
         }
     }
 }
