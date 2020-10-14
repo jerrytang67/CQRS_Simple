@@ -3,9 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using AutoMapper;
+using CQRS_Simple.API.Products.Dtos;
 using CQRS_Simple.API.Products.Queries;
 using CQRS_Simple.Domain.Products;
-using CQRS_Simple.Dtos;
 using CQRS_Simple.Infrastructure.Uow;
 using MediatR;
 

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using CQRS_Simple.API.Products.Dtos;
 using CQRS_Simple.Domain.Products.Request;
-using CQRS_Simple.Dtos;
 using MediatR;
 
 namespace CQRS_Simple.API.Products.Queries

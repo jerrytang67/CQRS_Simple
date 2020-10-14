@@ -1,7 +1,7 @@
 using Autofac;
 using CQRS_Simple.Infrastructure;
 
-namespace CQRS_Simple.Modules
+namespace CQRS_Simple.API.Modules
 {
     public class IocManagerModule : Autofac.Module
     {

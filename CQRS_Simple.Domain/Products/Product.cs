@@ -15,7 +15,6 @@ namespace CQRS_Simple.Domain.Products
         public string Code { get; set; }
 
         public string Description { get; set; }
-
     }
 
     public class ProductValidator : AbstractValidator<Product>
@@ -23,8 +22,8 @@ namespace CQRS_Simple.Domain.Products
         public ProductValidator()
         {
             RuleFor(x => x.Name).NotNull();
-            RuleFor(x => x.Name).Length(1, 256);
-            RuleFor(x => x.Code).Length(0, 256);
+            RuleFor(x => x.Name).Length(5, 256);
+            RuleFor(x => x.Code).Length(5, 256);
         }
     }
 }

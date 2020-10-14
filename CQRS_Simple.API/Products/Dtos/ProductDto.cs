@@ -1,6 +1,6 @@
 ﻿using CQRS_Simple.Domain.Products;
 
-namespace CQRS_Simple.Dtos
+namespace CQRS_Simple.API.Products.Dtos
 {
     /// <summary>
     /// <see cref="Product"/>

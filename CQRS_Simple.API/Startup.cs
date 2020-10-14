@@ -8,6 +8,7 @@ using CQRS_Simple.EntityFrameworkCore;
 using CQRS_Simple.Infrastructure;
 using CQRS_Simple.Infrastructure.MQ;
 using CQRS_Simple.Modules;
+using FluentValidation.AspNetCore;
 using MediatR.Extensions.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -45,6 +46,9 @@ namespace CQRS_Simple.API
         // called by the runtime before the ConfigureContainer method, below.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<SimpleDbContext>(options =>
+                options.UseSqlServer(_configuration[SqlServerConnection]));
+
             services.Configure<RabbitMQOptions>(_configuration.GetSection("RabbitMQ"));
 
             services.AddHostedService<MyListener>();
@@ -53,16 +57,19 @@ namespace CQRS_Simple.API
                 {
                     option.AllowEmptyInputInBodyModelBinding = true; // false as Default
                 })
-                .AddNewtonsoftJson(c => { c.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver(); });
+                .AddNewtonsoftJson(c => { c.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver(); })
 
-            services.AddFluentValidation(new[]
-            {
-                typeof(Startup).Assembly,
-                typeof(ProductsRequestInput).GetTypeInfo().Assembly
-            });
+                // 注入Api参数的FluentValidation
+                .AddFluentValidation(c => c.RegisterValidatorsFromAssembly(typeof(ProductValidator).Assembly))
+                ;
 
-            services.AddDbContext<SimpleDbContext>(options =>
-                options.UseSqlServer(_configuration[SqlServerConnection]));
+            // MediatR的FluentValidation 效果和ValidationBehavior一样,取其一
+            // services.AddFluentValidation(new[]
+            // {
+            //     typeof(Startup).GetTypeInfo().Assembly,
+            //     typeof(ProductsRequestInput).GetTypeInfo().Assembly
+            // });
+
 
             AddSwagger(services);
         }

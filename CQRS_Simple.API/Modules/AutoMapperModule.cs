@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Autofac;
 using AutoMapper;
 
-namespace CQRS_Simple.Modules
+namespace CQRS_Simple.API.Modules
 {
     public class AutoMapperModule : Autofac.Module
     {
-
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
