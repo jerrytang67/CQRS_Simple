@@ -5,7 +5,6 @@ namespace CQRS_Simple.Domain.Products.Request
 {
     public class ProductsRequestInput
     {
-        //        [Display(Name = "忽略数量")]
         public int SkipCount { get; set; }
     }
 
@@ -13,7 +12,7 @@ namespace CQRS_Simple.Domain.Products.Request
     {
         public ProductValidator()
         {
-//            RuleFor(x => x.SkipCount).NotNull();
+            RuleFor(x => x.SkipCount).GreaterThan(10);
         }
     }
 }

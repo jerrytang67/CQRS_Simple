@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 
-namespace CQRS_Simple.PipelineBehaviors
+namespace CQRS_Simple.API.PipelineBehaviors
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
+        where TRequest : IRequest<TResponse>
     {
         public readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -19,21 +19,19 @@ namespace CQRS_Simple.PipelineBehaviors
 
         public Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            //pre
-            var context = new ValidationContext(request);
-            var failures = _validators.Select(x => x.Validate(context))
-                .SelectMany(x => x.Errors)
-                .Where(x => x != null)
+            var context = new ValidationContext<TRequest>(request);
+            var failures = _validators
+                .Select(v => v.Validate(context))
+                .SelectMany(result => result.Errors)
+                .Where(f => f != null)
                 .ToList();
 
-            if (failures.Any())
+            if (failures.Count != 0)
             {
                 throw new ValidationException(failures);
             }
 
             return next();
-
-            //post
         }
     }
 }

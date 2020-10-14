@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
@@ -7,8 +6,6 @@ using AutoMapper;
 using CQRS_Simple.API.Products.Queries;
 using CQRS_Simple.Domain.Products;
 using CQRS_Simple.Dtos;
-using CQRS_Simple.Infrastructure;
-using CQRS_Simple.Infrastructure.Dapper;
 using CQRS_Simple.Infrastructure.Uow;
 using MediatR;
 
@@ -25,7 +22,7 @@ namespace CQRS_Simple.API.Products.Handlers
         public GetProductsQueryHandle(IRepository<Product, int> dapperRepository,
             IMapper mapper,
             ILifetimeScope container
-            )
+        )
         {
             _dapperRepository = dapperRepository;
             _mapper = mapper;
@@ -37,7 +34,7 @@ namespace CQRS_Simple.API.Products.Handlers
             var result = await _dapperRepository.GetByIdAsync(request.ProductId);
 
             var repository = _container.Resolve<IRepository<Product, int>>();
-           // var _repository = _iocManager.GetInstance<IRepository<Product, int>>();
+            // var _repository = _iocManager.GetInstance<IRepository<Product, int>>();
 
             repository.UnitOfWork.PrintKey();
 

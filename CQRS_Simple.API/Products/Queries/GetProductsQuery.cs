@@ -9,6 +9,9 @@ namespace CQRS_Simple.API.Products.Queries
     {
         public ProductsRequestInput Input { get; set; }
 
-        public GetProductsQuery(ProductsRequestInput input) { Input = input; }
+        public GetProductsQuery(ProductsRequestInput input)
+        {
+            Input = input;
+        }
     }
 }

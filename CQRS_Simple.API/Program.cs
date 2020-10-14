@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Autofac.Extensions.DependencyInjection;
+using CQRS_Simple.API;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;

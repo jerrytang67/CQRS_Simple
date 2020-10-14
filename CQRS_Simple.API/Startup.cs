@@ -1,15 +1,14 @@
 using System;
+using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Autofac.Extras.DynamicProxy;
-using Castle.DynamicProxy;
-using CQRS_Simple.Domain.Products;
+using CQRS_Simple.API.Modules;
+using CQRS_Simple.Domain.Products.Request;
 using CQRS_Simple.EntityFrameworkCore;
 using CQRS_Simple.Infrastructure;
 using CQRS_Simple.Infrastructure.MQ;
-using CQRS_Simple.Infrastructure.Uow;
 using CQRS_Simple.Modules;
-using FluentValidation.AspNetCore;
+using MediatR.Extensions.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +19,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 
-namespace CQRS_Simple
+namespace CQRS_Simple.API
 {
     public class Startup
     {
@@ -54,12 +53,13 @@ namespace CQRS_Simple
                 {
                     option.AllowEmptyInputInBodyModelBinding = true; // false as Default
                 })
-                .AddNewtonsoftJson(c => { c.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver(); })
-                .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<ProductValidator>())
-                ;
+                .AddNewtonsoftJson(c => { c.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver(); });
 
-            //inject into ValidationBehavior
-            //services.AddValidatorsFromAssembly(typeof(Startup).Assembly);
+            services.AddFluentValidation(new[]
+            {
+                typeof(Startup).Assembly,
+                typeof(ProductsRequestInput).GetTypeInfo().Assembly
+            });
 
             services.AddDbContext<SimpleDbContext>(options =>
                 options.UseSqlServer(_configuration[SqlServerConnection]));
@@ -73,10 +73,9 @@ namespace CQRS_Simple
         // Don't build the container; that gets done for you by the factory.
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            
             // 类型注入
             builder.Register(c => new CallLogger(Console.Out));
-            
+
             builder.RegisterModule(new IocManagerModule());
 
             builder.RegisterModule(new LoggerModule());
@@ -86,7 +85,6 @@ namespace CQRS_Simple
             builder.RegisterModule(new MediatorModule());
 
             builder.RegisterModule(new AutoMapperModule());
-
         }
 
         // Configure is where you add middleware. This is called after

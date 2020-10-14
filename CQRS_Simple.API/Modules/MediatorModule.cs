@@ -5,12 +5,12 @@ using System.Reflection;
 using Autofac;
 using Autofac.Core;
 using Autofac.Features.Variance;
-using CQRS_Simple.PipelineBehaviors;
+using CQRS_Simple.API.PipelineBehaviors;
 using FluentValidation;
 using MediatR;
 using MediatR.Pipeline;
 
-namespace CQRS_Simple.Modules
+namespace CQRS_Simple.API.Modules
 {
     public class MediatorModule : Autofac.Module
     {
@@ -64,8 +64,7 @@ namespace CQRS_Simple.Modules
                 _types.AddRange(types);
             }
 
-            public IEnumerable<IComponentRegistration> RegistrationsFor(Service service,
-                Func<Service, IEnumerable<IComponentRegistration>> registrationAccessor)
+            public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<ServiceRegistration>> registrationAccessor)
             {
                 var components = _source.RegistrationsFor(service, registrationAccessor);
                 foreach (var c in components)

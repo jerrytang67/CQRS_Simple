@@ -1,5 +1,4 @@
-﻿using CQRS_Simple.Domain.Products;
-using CQRS_Simple.Dtos;
+﻿using CQRS_Simple.Dtos;
 using MediatR;
 
 namespace CQRS_Simple.API.Products.Queries
