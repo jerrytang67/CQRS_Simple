@@ -1,85 +1,99 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using AutoMapper;
+using Autofac;
+using CQRS_Simple.API.Products.Commands;
+using CQRS_Simple.API.Products.Queries;
 using CQRS_Simple.Domain.Products;
-using CQRS_Simple.Dtos;
+using CQRS_Simple.Domain.Products.Request;
 using CQRS_Simple.Infrastructure;
-using CQRS_Simple.MQ;
-using CQRS_Simple.Products.Event;
+using CQRS_Simple.Infrastructure.Uow;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
-namespace CQRS_Simple.API.Orders
+namespace CQRS_Simple.API.Products
 {
     [ApiController]
     [Route("api/products")]
     public class ProductsController : ControllerBase
     {
-        private readonly ILogger<ProductsController> _logger;
-        private readonly RabbitMQClient _mq;
         private readonly IMediator _mediator;
-        private readonly IMapper _mapper;
-        private readonly IDapperRepository<Product, int> _productDapperRepository;
+        private readonly IIocManager _iocManager;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProductsController(
-            ILogger<ProductsController> logger,
-            IMediator mediator,
-            IDapperRepository<Product, int> productDapperRepository
-            , IMapper mapper, RabbitMQClient mq)
+        public ProductsController(IMediator mediator,  IIocManager iocManager, IUnitOfWork unitOfWork)
         {
-            _logger = logger;
             _mediator = mediator;
-            _productDapperRepository = productDapperRepository;
-            _mapper = mapper;
-            _mq = mq;
+            _iocManager = iocManager;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
-        [Route("getProduct/{productId}")]
-        [ProducesResponseType(typeof(ProductDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetProduct(int productId)
+        [Route("GetProduct")]
+        public async Task<IActionResult> GetProduct(int id)
         {
-            //            var product = await _mediator.Send(new GetProductsQuery(productId));
-            var product = await _productDapperRepository.GetByIdAsync(productId);
+            var result = await _mediator.Send(new GetProductByIdQuery(id));
 
-            product.Code = "asdfsdfasdfasdf";
+            var _r1 = _unitOfWork.GetRepository<Product, int>();
+            _r1.UnitOfWork.PrintKey();
 
-            await _productDapperRepository.AddAsync(new Product { Code = "aa", Name = "cc" });
 
-            await _productDapperRepository.UpdateAsync(product);
+            var _repository = _iocManager.GetInstance<IRepository<Product, int>>();
+            _repository.UnitOfWork.PrintKey();
 
-            _logger.LogInformation("GetProduct");
 
-            return Ok(_mapper.Map<ProductDto>(product));
+            var _repository2 = _iocManager.GetInstance<IRepository<Product, int>>();
+            _repository2.UnitOfWork.PrintKey();
+
+
+            var find = await _repository.GetByIdAsync(id);
+
+            if (find != null)
+            {
+                find.Name += "1_";
+                Log.Information(find?.Name);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            // throw new Exception("ss");
+
+            return result != null ? (IActionResult)Ok(result) : NotFound();
+        }
+
+        [HttpGet]
+        [Route("GetAll")]
+        public async Task<IActionResult> GetAll([FromQuery] ProductsRequestInput input)
+        {
+            var list = await _mediator.Send(new GetProductsQuery(input));
+
+            Debugger.Break();
+
+            return Ok(list);
         }
 
         [HttpPost]
-        [Route("getAll")]
-        [ProducesResponseType(typeof(List<ProductDto>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetAll(ProductsRequestInput input)
+        [Route("Create")]
+        public async Task<IActionResult> Create([FromBody]Product input)
         {
-            var list = await _productDapperRepository.FindAsync(x => x.Id > 1);
-
-            _mq.PushMessage(new { TT = 123 });
-
-            return Ok(_mapper.Map<List<ProductDto>>(list.ToList()));
+            var result = await _mediator.Send(new CreateProductCommand(input));
+            return result > 0 ? (IActionResult)Ok(result) : BadRequest();
         }
 
         [HttpDelete]
-        [Route("delete/{productId}")]
-        public async Task<IActionResult> Delete(int productId)
+        [Route("Delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            await _productDapperRepository.RemoveAsync(new Product() { Id = productId });
-            return Ok();
+            var count = await _mediator.Send(new DeleteProductCommand(id));
+            return count > 0 ? (IActionResult)Ok() : NotFound();
         }
-    }
 
-    public class ProductsRequestInput
-    {
-
+        [HttpPut]
+        [Route("Update")]
+        public async Task<IActionResult> Update([FromBody]Product input)
+        {
+            var count = await _mediator.Send(new UpdateProductCommand(input));
+            return count > 0 ? (IActionResult)Ok() : NotFound();
+        }
     }
 }

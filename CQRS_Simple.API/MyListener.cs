@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using CQRS_Simple.MQ;
+using CQRS_Simple.Infrastructure.MQ;
 using Microsoft.Extensions.Options;
 
 namespace CQRS_Simple
@@ -7,6 +7,7 @@ namespace CQRS_Simple
     public class MyListener : RabbitListener
     {
         private readonly RabbitMQOptions _options;
+
         public MyListener(IOptions<RabbitMQOptions> optionsAccessor)
             : base(optionsAccessor)
         {

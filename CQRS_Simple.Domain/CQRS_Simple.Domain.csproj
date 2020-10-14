@@ -2,10 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>8</LangVersion>
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="9.2.0" />
+
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CQRS_Simple.Infrastructure\CQRS_Simple.Infrastructure.csproj" />

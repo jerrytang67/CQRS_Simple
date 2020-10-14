@@ -5,12 +5,12 @@ using System.Reflection;
 using Autofac;
 using Autofac.Core;
 using Autofac.Features.Variance;
-using CQRS_Simple.Products.Event;
+using CQRS_Simple.API.PipelineBehaviors;
 using FluentValidation;
 using MediatR;
 using MediatR.Pipeline;
 
-namespace CQRS_Simple.Modules
+namespace CQRS_Simple.API.Modules
 {
     public class MediatorModule : Autofac.Module
     {
@@ -24,23 +24,22 @@ namespace CQRS_Simple.Modules
 
             builder.RegisterAssemblyTypes(typeof(IMediator).GetTypeInfo().Assembly).AsImplementedInterfaces();
 
-            var mediatrOpenTypes = new[]
-            {
-            typeof(IRequestHandler<,>),
-            typeof(INotificationHandler<>),
-            typeof(IValidator<>),
-        };
+            var mediatrOpenTypes = new[] { typeof(IRequestHandler<,>), typeof(INotificationHandler<>), typeof(IValidator<>), };
 
             foreach (var mediatrOpenType in mediatrOpenTypes)
             {
                 builder
-                    .RegisterAssemblyTypes(typeof(GetProductsQuery).GetTypeInfo().Assembly)
+                    .RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
                     .AsClosedTypesOf(mediatrOpenType)
                     .AsImplementedInterfaces();
             }
 
+
             builder.RegisterGeneric(typeof(RequestPostProcessorBehavior<,>)).As(typeof(IPipelineBehavior<,>));
             builder.RegisterGeneric(typeof(RequestPreProcessorBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+
+            //Mediator validation Pipeline
+            builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
             builder.Register<ServiceFactory>(ctx =>
             {
@@ -65,9 +64,7 @@ namespace CQRS_Simple.Modules
                 _types.AddRange(types);
             }
 
-            public IEnumerable<IComponentRegistration> RegistrationsFor(
-                Service service,
-                Func<Service, IEnumerable<IComponentRegistration>> registrationAccessor)
+            public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<ServiceRegistration>> registrationAccessor)
             {
                 var components = _source.RegistrationsFor(service, registrationAccessor);
                 foreach (var c in components)

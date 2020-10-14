@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Autofac.Extensions.DependencyInjection;
+using CQRS_Simple.API;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -13,10 +14,14 @@ namespace CQRS_Simple
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
+#if DEBUG
                 .MinimumLevel.Debug()
+#else
+                .MinimumLevel.Information()
+#endif
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.File(new RenderedCompactJsonFormatter(), "/logs/log.json")
+//                .WriteTo.File(new RenderedCompactJsonFormatter(), "/logs/log.json")
                 .CreateLogger();
 
             try
@@ -36,15 +41,14 @@ namespace CQRS_Simple
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-//                .UseSerilog()
+                .UseSerilog()
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder
-                        .UseContentRoot(Directory.GetCurrentDirectory())
-                        .UseIISIntegration()
-                        .UseStartup<Startup>()
-                        .UseSerilog();
-                });
+                                {
+                                    webBuilder
+                                        .UseContentRoot(Directory.GetCurrentDirectory())
+                                        .UseIISIntegration()
+                                        .UseStartup<Startup>();
+                                });
     }
 }

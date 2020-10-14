@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Text;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Serilog;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace CQRS_Simple.MQ
+namespace CQRS_Simple.Infrastructure.MQ
 {
     public class RabbitMQClient : IDisposable
     {

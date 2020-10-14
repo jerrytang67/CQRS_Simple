@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 
-namespace CQRS_Simple.Infrastructure
+namespace CQRS_Simple.Infrastructure.Dapper
 {
     public class SqlConnectionFactory : ISqlConnectionFactory, IDisposable
     {

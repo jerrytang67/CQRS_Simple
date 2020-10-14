@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Logging;
 
-namespace CQRS_Simple.Modules
+namespace CQRS_Simple.API.Modules
 {
     public class LoggerModule : Autofac.Module
     {

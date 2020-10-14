@@ -5,8 +5,7 @@ namespace CQRS_Simple.Infrastructure
 {
     public class Entity<TPrimaryKey> : IEntity<TPrimaryKey>
     {
-        [Key]
-        public virtual TPrimaryKey Id { get; set; }
+        [Key] public virtual TPrimaryKey Id { get; set; }
 
         private List<IDomainEvent> _domainEvents;
 
@@ -21,8 +20,8 @@ namespace CQRS_Simple.Infrastructure
         /// <param name="domainEvent"></param>
         protected void AddDomainEvent(IDomainEvent domainEvent)
         {
-            _domainEvents = _domainEvents ?? new List<IDomainEvent>();
-            this._domainEvents.Add(domainEvent);
+            _domainEvents ??= new List<IDomainEvent>();
+            _domainEvents.Add(domainEvent);
         }
 
         /// <summary>

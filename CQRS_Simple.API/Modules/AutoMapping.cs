@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using CQRS_Simple.API.Products.Dtos;
 using CQRS_Simple.Domain.Products;
-using CQRS_Simple.Dtos;
 
 namespace CQRS_Simple.Modules
 {
