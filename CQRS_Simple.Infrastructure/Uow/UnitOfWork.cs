@@ -1,33 +1,35 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace CQRS_Simple.Infrastructure.Uow
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly IIocManager _iocManager;
+        private readonly ILogger<UnitOfWork> _log;
         private Guid KEY { get; }
-
         public DbContext Context { get; }
-
         public IDbContextTransaction Transaction;
 
-        public UnitOfWork(DbContext context, IIocManager iocManager)
+        public UnitOfWork(DbContext context,
+            IIocManager iocManager,
+            ILogger<UnitOfWork> log
+        )
         {
             _iocManager = iocManager;
+            _log = log;
             Context = context;
 
             Transaction = context.Database.BeginTransaction();
 
             KEY = Guid.NewGuid();
-#if DEBUG
-            Log.Information($"UnitOfWork Init {KEY}");
-#endif
+
+            _log.LogDebug($"UnitOfWork Init {KEY}");
         }
+
         public int SaveChanges()
         {
             return Context.SaveChanges();
@@ -45,7 +47,7 @@ namespace CQRS_Simple.Infrastructure.Uow
 
         public void PrintKey()
         {
-            Log.Information($"PrintKey:{KEY}");
+            _log.LogInformation($"PrintKey:{KEY}");
         }
 
         /// <summary>
@@ -58,9 +60,7 @@ namespace CQRS_Simple.Infrastructure.Uow
             Transaction?.Dispose();
             Context?.Dispose();
 
-#if DEBUG
-            Log.Information($"Context CleanUp");
-#endif
+            _log.LogDebug($"Context CleanUp");
         }
 
 
@@ -77,11 +77,13 @@ namespace CQRS_Simple.Infrastructure.Uow
             {
                 result = -1;
                 Transaction?.Rollback();
-                Log.Error("Context Transaction Error");
-                Log.Error(e.Message);
+                _log.LogError("Context Transaction Error");
+                _log.LogError(e.Message);
             }
+
             return result;
         }
+
         private async Task<int> CommitAsync()
         {
             var result = 0;
@@ -96,21 +98,18 @@ namespace CQRS_Simple.Infrastructure.Uow
                 result = -1;
                 if (Transaction != null)
                     await Transaction.RollbackAsync();
-                Log.Error("Context Transaction Error");
-                Log.Error(e.Message);
+                _log.LogError("Context Transaction Error");
+                _log.LogError(e.Message);
             }
+
             return result;
         }
-
 
 
         public void Dispose()
         {
             Context?.Dispose();
-#if DEBUG
-            Log.Information($"Context Dispose");
-
-#endif
+            _log.LogDebug($"Context Dispose");
         }
     }
 }

@@ -52,7 +52,6 @@ namespace CQRS_Simple.Modules
             builder.RegisterGeneric(typeof(Repository<,>)).As(typeof(IRepository<,>))
                 .InstancePerLifetimeScope()
                 .InterceptedBy(typeof(CallLogger))
-                
                 .EnableInterfaceInterceptors();
             ;
         }

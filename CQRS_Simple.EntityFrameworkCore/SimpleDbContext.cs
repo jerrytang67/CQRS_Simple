@@ -1,7 +1,5 @@
-﻿using System;
-using CQRS_Simple.Domain.Products;
+﻿using CQRS_Simple.Domain.Products;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 
 namespace CQRS_Simple.EntityFrameworkCore
 {
@@ -16,9 +14,6 @@ namespace CQRS_Simple.EntityFrameworkCore
         public SimpleDbContext(DbContextOptions<SimpleDbContext> options)
             : base(options)
         {
-#if DEBUG
-            Log.Debug($"SimpleDbContext Init");
-#endif
         }
     }
 }

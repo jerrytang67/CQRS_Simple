@@ -1,22 +1,19 @@
 using System;
-using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CQRS_Simple.API.Modules;
-using CQRS_Simple.Domain.Products.Request;
+using CQRS_Simple.Domain.Products;
 using CQRS_Simple.EntityFrameworkCore;
 using CQRS_Simple.Infrastructure;
 using CQRS_Simple.Infrastructure.MQ;
 using CQRS_Simple.Modules;
 using FluentValidation.AspNetCore;
-using MediatR.Extensions.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 
@@ -27,7 +24,6 @@ namespace CQRS_Simple.API
         public IConfigurationRoot _configuration { get; }
         public ILifetimeScope AutofacContainer { get; private set; }
 
-        public ILoggerFactory _LoggerFactory { get; private set; }
 
         private const string SqlServerConnection = "ConnectionStrings:Default";
 
@@ -97,7 +93,7 @@ namespace CQRS_Simple.API
         // Configure is where you add middleware. This is called after
         // ConfigureContainer. You can use IApplicationBuilder.ApplicationServices
         // here if you need to resolve things from the container.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();
 
@@ -115,10 +111,10 @@ namespace CQRS_Simple.API
 
             app.UseStaticFiles();
 
-            if (!env.IsDevelopment())
-            {
-                app.UseSpaStaticFiles();
-            }
+            // if (!env.IsDevelopment())
+            // {
+            //     app.UseSpaStaticFiles();
+            // }
 
             app.UseRouting();
 

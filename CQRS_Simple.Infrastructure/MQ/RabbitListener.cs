@@ -3,23 +3,26 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Serilog;
 
 namespace CQRS_Simple.Infrastructure.MQ
 {
     public class RabbitListener : IHostedService
     {
+        private readonly ILogger<RabbitListener> _log;
         private readonly RabbitMQOptions _options;
         private readonly IConnection connection;
         private readonly IModel channel;
 
         public RabbitListener(
-            IOptions<RabbitMQOptions> optionsAccessor
-            )
+            IOptions<RabbitMQOptions> optionsAccessor,
+            IIocManager iocManager
+        )
         {
+            _log = iocManager.GetInstance<ILogger<RabbitListener>>();
             _options = optionsAccessor.Value;
             try
             {
@@ -32,12 +35,11 @@ namespace CQRS_Simple.Infrastructure.MQ
                 };
                 this.connection = factory.CreateConnection();
                 this.channel = connection.CreateModel();
-                Log.Information($"RabbitMQ 连接成功");
-
+                _log.LogInformation($"RabbitMQ 连接成功");
             }
             catch (Exception ex)
             {
-                Log.Error($"RabbitListener init error,ex:{ex.Message}");
+                _log.LogError($"RabbitListener init error,ex:{ex.Message}");
             }
         }
 
@@ -48,7 +50,7 @@ namespace CQRS_Simple.Infrastructure.MQ
             await Task.CompletedTask;
         }
 
-        protected string QueueName= "QueueName";
+        protected string QueueName = "QueueName";
         protected string RouteKey;
 
         // 处理消息的方法
@@ -66,11 +68,12 @@ namespace CQRS_Simple.Infrastructure.MQ
                 var body = ea.Body;
                 var message = Encoding.UTF8.GetString(body.ToArray());
                 var result = await ProcessAsync(message);
-                Log.Information($"收到消息： {message} routerKey: { ea.RoutingKey}");
+                _log.LogInformation("收到消息： {@message} routerKey: {@RoutingKey}", message, ea.RoutingKey);
                 if (result)
                 {
                     channel.BasicAck(ea.DeliveryTag, false);
                 }
+
                 await Task.Yield();
             };
             channel.BasicConsume(queue: QueueName, consumer: consumer);

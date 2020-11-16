@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
-using Serilog;
 
 namespace CQRS_Simple.Infrastructure.MQ
 {
     public class RabbitMQClient : IDisposable
     {
+        private readonly ILogger<RabbitMQClient> _log;
         private readonly RabbitMQOptions _options;
 
         private IModel _channel;
         private IConnection _connection;
 
         public RabbitMQClient(
-            IOptions<RabbitMQOptions> optionsAccessor
+            IOptions<RabbitMQOptions> optionsAccessor,
+            ILogger<RabbitMQClient> log
         )
         {
+            _log = log;
             _options = optionsAccessor.Value;
             try
             {
@@ -30,7 +33,7 @@ namespace CQRS_Simple.Infrastructure.MQ
                 };
                 this._connection = factory.CreateConnection();
                 this._channel = _connection.CreateModel();
-                Log.Information($"RabbitMQ Client 连接成功");
+                _log.LogInformation($"RabbitMQ Client 连接成功");
             }
             catch (Exception ex)
             {
@@ -45,7 +48,7 @@ namespace CQRS_Simple.Infrastructure.MQ
 
             var exchangeName = "message";
 
-            Log.Debug($"PushMessage queryName:{queryName} routingKey:{routerKey}");
+            _log.LogDebug("PushMessage queryName:{@queryName} routingKey:{@routerKey}", queryName, routerKey);
 
             //定义一个Direct类型交换机
             _channel.ExchangeDeclare(exchangeName, ExchangeType.Topic, true, false, null);
@@ -65,7 +68,7 @@ namespace CQRS_Simple.Infrastructure.MQ
         {
             _channel?.Dispose();
             _connection?.Dispose();
-            Log.Information($"RabbitMQ Client Dispose");
+            _log.LogInformation($"RabbitMQ Client Dispose");
         }
     }
 }

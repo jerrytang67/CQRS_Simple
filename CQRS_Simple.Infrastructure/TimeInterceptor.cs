@@ -1,7 +1,8 @@
-﻿using System;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Castle.DynamicProxy;
+using Newtonsoft.Json;
 
 
 namespace CQRS_Simple.Infrastructure
@@ -26,14 +27,19 @@ namespace CQRS_Simple.Infrastructure
         {
             if (invocation.Method.IsPublic)
             {
-                _output.WriteLine("你正在调用方法 \"{0}\"  参数是 {1}... ",
-                    invocation.Method.Name,
+                var sw = new Stopwatch();
+                sw.Start();
+
+                _output.WriteLine($"你正在调用方法 \"{invocation.Method.DeclaringType!.Namespace}.{invocation.Method.DeclaringType!.Name}.{invocation.Method.Name}\"  参数是 {0} "
+                    ,
                     string.Join(", ", invocation.Arguments.Select(a => (a ?? "").ToString()).ToArray()));
 
                 //在被拦截的方法执行完毕后 继续执行
                 invocation.Proceed();
 
-                _output.WriteLine("方法执行完毕，返回结果：{0}", invocation.ReturnValue);
+                sw.Stop();
+
+                _output.WriteLine($"方法执行完毕，返回结果：运行时间{sw.ElapsedMilliseconds / 100.0:N3}秒");
             }
         }
     }

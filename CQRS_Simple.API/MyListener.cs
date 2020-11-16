@@ -1,15 +1,19 @@
 ﻿using System.Threading.Tasks;
+using CQRS_Simple.Infrastructure;
 using CQRS_Simple.Infrastructure.MQ;
 using Microsoft.Extensions.Options;
 
-namespace CQRS_Simple
+namespace CQRS_Simple.API
 {
     public class MyListener : RabbitListener
     {
         private readonly RabbitMQOptions _options;
 
-        public MyListener(IOptions<RabbitMQOptions> optionsAccessor)
-            : base(optionsAccessor)
+        public MyListener(
+            IOptions<RabbitMQOptions> optionsAccessor,
+            IIocManager iocManager
+        )
+            : base(optionsAccessor, iocManager)
         {
             _options = optionsAccessor.Value;
             base.QueueName = _options.QueryName;
