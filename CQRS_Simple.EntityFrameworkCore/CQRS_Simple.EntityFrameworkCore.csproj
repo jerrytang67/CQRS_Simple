@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp5.0</TargetFramework>
-    <LangVersion>8</LangVersion>
+    <LangVersion>default</LangVersion>
     <ApplicationIcon />
     <StartupObject />
   </PropertyGroup>
