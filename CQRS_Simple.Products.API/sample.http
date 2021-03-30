@@ -1,0 +1,31 @@
+//Deposit Money
+
+POST http://localhost:21020/api/products/Create
+Content-Type: application/json-patch+json
+
+{
+  "name": "string",
+  "code": "string222222",
+  "description": "string"
+}
+
+###
+
+//View G
+
+GET http://localhost:21020/api/products/GetProduct
+Content-Type: application/json
+
+{
+  "id": 1
+}
+###
+
+//View G
+
+GET http://localhost:21020/api/products/GetAll
+Content-Type: application/json
+
+{
+  "id": 1
+}
