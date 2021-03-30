@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CQRS_Simple.Core
+namespace CQRS_Simple.Core.Dapper
 {
     /// <summary>
     /// A result object with the generated sql and dynamic params.

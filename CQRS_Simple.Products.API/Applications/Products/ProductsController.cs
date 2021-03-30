@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
-using CQRS_Simple.API.Applications.Products.Queries;
 using CQRS_Simple.API.Products.Commands;
 using CQRS_Simple.Core;
 using CQRS_Simple.Core.Uow;
 using CQRS_Simple.Products.API.Applications.Products.Commands;
+using CQRS_Simple.Products.API.Applications.Products.Queries;
 using CQRS_Simple.Products.API.Domain.Products;
 using CQRS_Simple.Products.API.Domain.Products.Request;
 using MediatR;
@@ -53,7 +54,7 @@ namespace CQRS_Simple.API.Products
             _repository2.UnitOfWork.PrintKey();
 
 
-            var find = await _repository.GetByIdAsync(id);
+            var find = await _repository.GetByIdAsync(id, CancellationToken.None);
 
             if (find != null)
             {

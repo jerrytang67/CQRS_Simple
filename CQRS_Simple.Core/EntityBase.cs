@@ -3,6 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CQRS_Simple.Core
 {
+    public interface IEntity<TPrimaryKey>
+    {
+        TPrimaryKey Id { get; set; }
+
+        void ClearDomainEvents();
+    }
+
     public class Entity<TPrimaryKey> : IEntity<TPrimaryKey>
     {
         [Key] public virtual TPrimaryKey Id { get; set; }
@@ -43,12 +50,5 @@ namespace CQRS_Simple.Core
         {
             return $"[{GetType().Name} {Id}]";
         }
-    }
-
-    public interface IEntity<TPrimaryKey>
-    {
-        TPrimaryKey Id { get; set; }
-
-        void ClearDomainEvents();
     }
 }
