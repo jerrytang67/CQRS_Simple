@@ -29,3 +29,9 @@ Content-Type: application/json
 {
   "id": 1
 }
+
+###
+//dapr 
+
+GET http://localhost:49181/v1.0/invoke/product-api/method/api/products/GetAll
+Content-Type: application/json

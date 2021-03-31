@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-namespace CQRS_Simple.API.Products
+namespace CQRS_Simple.Products.API.Applications.Products
 {
     [ApiController]
     [Route("api/products")]
@@ -44,16 +44,13 @@ namespace CQRS_Simple.API.Products
 
             var _r1 = _unitOfWork.GetRepository<Product, int>();
             _r1.UnitOfWork.PrintKey();
-
-
+            
             var _repository = _iocManager.GetInstance<IRepository<Product, int>>();
             _repository.UnitOfWork.PrintKey();
-
-
+            
             var _repository2 = _iocManager.GetInstance<IRepository<Product, int>>();
             _repository2.UnitOfWork.PrintKey();
-
-
+            
             var find = await _repository.GetByIdAsync(id, CancellationToken.None);
 
             if (find != null)

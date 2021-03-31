@@ -1,0 +1,11 @@
+name: service-kinds
+namespace: demo
+registry: francis67
+extensions:
+  - name: dapr
+services:
+  # A project service
+  - name: product-api
+    project: CQRS_Simple.Products.API/CQRS_Simple.Products.API.csproj
+    bindings:
+      - port: 21020
